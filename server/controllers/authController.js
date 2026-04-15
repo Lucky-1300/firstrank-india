@@ -1,9 +1,13 @@
 const registerUser = (req, res) => {
-  res.send("User Registered ✅");
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).send({ message: "All fields are required ❌" });
+  }
+
+  const response = authService.register({ name, email, password });
+
+  res.send(response);
 };
 
-const loginUser = (req, res) => {
-  res.send("User Logged In ✅");
-};
-
-module.exports = { registerUser, loginUser };
+module.exports = { registerUser };
