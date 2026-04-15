@@ -6,9 +6,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// test route
+// root route
 app.get("/", (req, res) => {
-  res.send("API is running 🚀");
+  res.send("Backend is running 🚀");
 });
+
+// test route
+app.get("/api/test", (req, res) => {
+  res.send("API is working 🚀");
+});
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 
 module.exports = app;
