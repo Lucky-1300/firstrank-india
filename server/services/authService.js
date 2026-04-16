@@ -1,35 +1,63 @@
-const jwt = require("jsonwebtoken");
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
 
-// ✅ REGISTER
-const register = (userData) => {
-  const { password, ...safeData } = userData;
+// ================= REGISTER =================
+const register = async (userData) => {
+  const { name, email, password, mobile } = userData;
 
-  return {
-    success: true,
-    message: "User registered successfully ✅",
-    data: safeData,
-  };
-};
+  // 1. Check if user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new Error("User already exists ");
+  }
 
-// ✅ LOGIN
-const login = (userData) => {
-  const { email } = userData;
+  // 2. Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = {
-    id: 1,
+  // 3. Create user
+  const user = await User.create({
+    name,
     email,
-  };
+    password: hashedPassword,
+    mobile,
+  });
 
-  const token = jwt.sign(user, "secretkey", { expiresIn: "1h" });
-
+  // 4. Return safe data (no password)
   return {
-    success: true,
-    message: "Login successful ✅",
+    message: "User registered successfully ",
     data: {
-      user,
-      token,
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      mobile: user.mobile,
     },
   };
 };
 
-module.exports = { register, login };
+// ================= LOGIN =================
+const login = async (email, password) => {
+  // 1. Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found ");
+  }
+
+  // 2. Compare password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Invalid credentials ");
+  }
+
+  // 3. Return safe data
+  return {
+    message: "Login successful ",
+    data: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+  };
+};
+
+// ================= EXPORT =================
+export { register, login };

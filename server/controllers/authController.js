@@ -1,33 +1,52 @@
-const authService = require("../services/authService");
+import { register, login } from "../services/authService.js";
 
-// ✅ REGISTER (Day 3)
-const registerUser = (req, res) => {
-  const { name, email, password } = req.body;
+// REGISTER
+const registerUser = async (req, res) => {
+  try {
+    const { name, email, password, mobile } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      message: "All fields are required ❌",
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "All fields are required ",
+      });
+    }
+
+    const response = await register({
+      name,
+      email,
+      password,
+      mobile,
+    });
+
+    res.status(201).json(response);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Something went wrong ",
     });
   }
-
-  const response = authService.register({ name, email, password });
-
-  res.status(201).json(response);
 };
 
-// ✅ LOGIN (Day 4)
-const loginUser = (req, res) => {
-  const { email, password } = req.body;
+// LOGIN
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({
-      message: "Email and password are required ❌",
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password required ",
+      });
+    }
+
+    const response = await login(email, password);
+
+    res.status(200).json(response);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Login failed ",
     });
   }
-
-  const response = authService.login({ email, password });
-
-  res.status(200).json(response);
 };
 
-module.exports = { registerUser, loginUser };
+export { registerUser, loginUser };
