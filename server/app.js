@@ -17,6 +17,35 @@ app.get("/api/test", (req, res) => {
   res.send("API is working ");
 });
 
+
+
+//register APp
+app.post("/register", (req, res) => {
+
+  const { name, email, password } = req.body;
+
+  res.json({
+    message: "User registered successfully",
+    user: { name, email }
+  });
+
+});
+
+// login API
+app.post("/login", (req, res) => {
+
+  const { email, password } = req.body;
+
+  res.json({
+    message: "Login successful",
+    token: "demo_token_123"
+  });
+
+});
+
+
+
+
 //auth route 
 app.use("/api/auth", authRoutes);
 

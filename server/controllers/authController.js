@@ -5,25 +5,33 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, mobile } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "All fields are required ",
-      });
-    }
+    // if (!name || !email || !password) {
+    //   return res.status(400).json({
+    //     message: "All fields are required ",
+    //   });
+    // }
+if (!name || !email || !password) {
+  return res.status(400).json({
+    success: false,
+    message: "All fields are required",
+  });
+}
+    
+res.status(201).json({
+  success: true,
+  token: "dummy_token_123",
+  user: {
+    name,
+    email,
+  },
+});
 
-    const response = await register({
-      name,
-      email,
-      password,
-      mobile,
-    });
-
-    res.status(201).json(response);
 
   } catch (error) {
-    res.status(500).json({
-      message: error.message || "Something went wrong ",
-    });
+   res.status(500).json({
+  success: false,
+  message: error.message || "Something went wrong",
+});
   }
 };
 
@@ -34,18 +42,24 @@ const loginUser = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
+        success:false,
         message: "Email and password required ",
       });
     }
+    res.status(200).json({
+  success: true,
+  token: "dummy_token_123",
+  user: {
+    email,
+  },
+});
 
-    const response = await login(email, password);
-
-    res.status(200).json(response);
 
   } catch (error) {
     res.status(500).json({
-      message: error.message || "Login failed ",
-    });
+  success: false,
+  message: error.message || "Login failed",
+});
   }
 };
 

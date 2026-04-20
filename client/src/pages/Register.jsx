@@ -15,18 +15,50 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+
+  // const handleChange = (e) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [e.target.name]: e.target.value,
+  //   }));
+  //   setError("");
+  // };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    setError("");
-  };
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  setErrors((prev) => ({
+    ...prev,
+    [name]: ""
+  }));
+};
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+if (!formData.name) {
+  setErrors({ name: "Name is required" });
+  return;
+}
+
+if (!formData.email) {
+  setErrors({ email: "Email is required" });
+  return;
+}
+if (formData.password.length < 8) {
+  setErrors({ password: "Password must be at least 8 characters" });
+  return;
+}
+
+
     setLoading(true);
 
     try {
@@ -35,15 +67,26 @@ export default function Register() {
         body: JSON.stringify(formData),
       });
 
+      // if (res.success) {
+      //   localStorage.setItem("authToken", res.token);
+      //   localStorage.setItem("user", JSON.stringify(res.user));
+      //   navigate("/dashboard");
+      // } 
       if (res.success) {
-        localStorage.setItem("authToken", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
-        navigate("/dashboard");
-      } else {
-        setError(res.message || "Registration failed");
+  alert("You are signed up successfully 🎉");
+
+  localStorage.setItem("authToken", res.token);
+  localStorage.setItem("user", JSON.stringify(res.user));
+
+  navigate("/login");
+}
+      else {
+        // setError(res.message || "Registration failed");
+        setErrors({ email: res.message || "Registration failed" });
       }
     } catch (err) {
-      setError("Something went wrong");
+      // setError("Something went wrong");
+      setErrors({ email: "Something went wrong" });
     } finally {
       setLoading(false);
     }
@@ -72,44 +115,72 @@ export default function Register() {
             It takes less than a minute
           </p>
 
-          {error && (
+          {/* {error && (
             <div className="mb-4 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">
               {error}
             </div>
-          )}
+          )} */}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
             <input
               type="text"
               name="name"
-              required
+            
               placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
               className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400"
             />
+               
+               {errors.name && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors.name}
+  </p>
+)}
+
+
+
+
+
+
 
             <input
               type="email"
               name="email"
-              required
+              
               placeholder="Email Address"
               value={formData.email}
               onChange={handleChange}
               className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400"
             />
 
+          {errors.email && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors.email}
+  </p>
+)}
+
+
+
+
+
             <input
               type="password"
               name="password"
-              required
+              
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
               className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400"
             />
 
+      
+{errors.password && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors.password}
+  </p>
+)}
             <select
               name="category"
               value={formData.category}
