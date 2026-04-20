@@ -13,18 +13,33 @@ export default function Login() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    setError("");
+    setErrors({});
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+if (!formData.email) {
+  setErrors({ email: "Email is required" });
+  return;
+}
+
+if (!formData.password) {
+  setErrors({ password: "Password is required" });
+  return;
+}
+
+if (formData.password.length < 8) {
+  setErrors({ password: "Password must be at least 8 characters" });
+  return;
+}
+
     setLoading(true);
 
     try {
@@ -36,12 +51,12 @@ export default function Login() {
       if (res.success) {
         localStorage.setItem("authToken", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        navigate("/dashboard");
+        navigate("/");
       } else {
-        setError(res.message || "Login failed");
+        setErrors({ password: res.message || "Login failed" });
       }
     } catch (err) {
-      setError("Something went wrong");
+     setErrors({ password: "Something went wrong" });
     } finally {
       setLoading(false);
     }
@@ -70,11 +85,11 @@ export default function Login() {
             Access your dashboard instantly
           </p>
 
-          {error && (
+          {/* {error && (
             <div className="mb-4 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">
               {error}
             </div>
-          )}
+          )} */}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -83,25 +98,38 @@ export default function Login() {
               <input
                 type="email"
                 name="email"
-                required
+                
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400"
                 placeholder="you@example.com"
               />
             </div>
+             {errors.email && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors.email}
+  </p>
+)}
+  
 
             <div>
               <label className="block text-sm font-medium mb-2">Password</label>
               <input
                 type="password"
                 name="password"
-                required
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-400"
                 placeholder="••••••••"
               />
+
+  {errors.password && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors.password}
+  </p>
+)}
+
+
             </div>
 
             <Button fullWidth size="lg" disabled={loading}>
