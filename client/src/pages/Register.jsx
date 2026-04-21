@@ -72,13 +72,18 @@ if (formData.password.length < 8) {
       //   localStorage.setItem("user", JSON.stringify(res.user));
       //   navigate("/dashboard");
       // } 
-      if (res.success) {
+//       if (res.success) {
+//   alert("You are signed up successfully 🎉");
+
+//   localStorage.setItem("authToken", res.token);
+//   localStorage.setItem("user", JSON.stringify(res.user));
+
+//   navigate("/");
+// }
+if (res.success) {
   alert("You are signed up successfully 🎉");
 
-  localStorage.setItem("authToken", res.token);
-  localStorage.setItem("user", JSON.stringify(res.user));
-
-  navigate("/login");
+  navigate("/");
 }
       else {
         // setError(res.message || "Registration failed");

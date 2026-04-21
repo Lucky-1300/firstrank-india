@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+const token = localStorage.getItem("authToken");
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -29,6 +32,18 @@ export default function Navbar() {
     location.pathname === path
       ? "text-orange-600 font-semibold"
       : "text-gray-700 hover:text-orange-600";
+
+
+      const handleLogout = () => {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("user");
+  navigate("/");
+};
+
+
+
+
+
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -55,31 +70,45 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-          {navLinks.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`transition ${activeClass(item.path)}`}
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
+      
+<div className="hidden lg:flex items-center gap-8 text-sm font-medium">
+  {navLinks.map((item) => (
+    <Link
+      key={item.path}
+      to={token ? item.path : "/"}
+      onClick={(e) => {
+        if (!token && item.path !== "/") {
+          e.preventDefault();
+          alert("Please login first");
+        }
+      }}
+      className={`transition ${activeClass(item.path)}`}
+    >
+      {item.name}
+    </Link>
+  ))}
+</div>
+      
 
-        {/* Desktop CTA */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/login">
-            <Button variant="secondary" size="sm">
-              Sign In
-            </Button>
-          </Link>
+  {token ? (
+    <Button size="sm" onClick={handleLogout}>
+      Logout
+    </Button>
+  ) : (
+    <>
+      <Link to="/login">
+        <Button variant="secondary" size="sm">
+          Sign In
+        </Button>
+      </Link>
 
-          <Link to="/register">
-            <Button size="sm">Get Started</Button>
-          </Link>
-        </div>
+      <Link to="/register">
+        <Button size="sm">Get Started</Button>
+      </Link>
+    </>
+  )}
+</div>
 
         {/* Mobile Toggle */}
         <button
@@ -114,7 +143,7 @@ export default function Navbar() {
         }`}
       >
         <div className="px-5 py-5 bg-white flex flex-col gap-1">
-          {navLinks.map((item) => (
+          { navLinks.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -127,16 +156,24 @@ export default function Navbar() {
           ))}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-            <Link to="/login">
-              <Button variant="secondary" fullWidth>
-                Sign In
-              </Button>
-            </Link>
+  {token ? (
+    <Button fullWidth onClick={handleLogout}>
+      Logout
+    </Button>
+  ) : (
+    <>
+      <Link to="/login">
+        <Button variant="secondary" fullWidth>
+          Sign In
+        </Button>
+      </Link>
 
-            <Link to="/register">
-              <Button fullWidth>Get Started</Button>
-            </Link>
-          </div>
+      <Link to="/register">
+        <Button fullWidth>Get Started</Button>
+      </Link>
+    </>
+  )}
+</div>
         </div>
       </div>
     </nav>

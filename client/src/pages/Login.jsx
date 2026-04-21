@@ -47,6 +47,11 @@ if (formData.password.length < 8) {
         method: "POST",
         body: JSON.stringify(formData),
       });
+       
+
+      console.log("LOGIN RESPONSE",res)
+
+
 
       if (res.success) {
         localStorage.setItem("authToken", res.token);
