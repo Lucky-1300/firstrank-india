@@ -8,23 +8,32 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  // useEffect(() => {
+  //   const fetchProfile = async () => {
+  //     try {
+  //       const res = await apiCall("/auth/profile", { method: "GET" });
+
+  //       if (res.success) {
+  //         setUser(res.user);
+  //       } else {
+  //         navigate("/login");
+  //       }
+  //     } catch {
+  //       navigate("/login");
+  //     }
+  //   };
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await apiCall("/auth/profile", { method: "GET" });
+  const storedUser = localStorage.getItem("user");
 
-        if (res.success) {
-          setUser(res.user);
-        } else {
-          navigate("/login");
-        }
-      } catch {
-        navigate("/login");
-      }
-    };
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  } else {
+    navigate("/login");
+  }
+}, [navigate])
 
-    fetchProfile();
-  }, [navigate]);
+  //   fetchProfile();
+  // }, [navigate]);
 
   if (!user) {
     return (
