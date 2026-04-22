@@ -1,39 +1,66 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { apiCall } from "../services/api";
+import { Zap, TrendingUp, Clock } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchProfile = async () => {
-  //     try {
-  //       const res = await apiCall("/auth/profile", { method: "GET" });
-
-  //       if (res.success) {
-  //         setUser(res.user);
-  //       } else {
-  //         navigate("/login");
-  //       }
-  //     } catch {
-  //       navigate("/login");
-  //     }
-  //   };
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const storedUser = localStorage.getItem("user");
 
-  if (storedUser) {
-    setUser(JSON.parse(storedUser));
-  } else {
-    navigate("/login");
-  }
-}, [navigate])
+      // ✅ DEV MODE (no backend / no login)
+      if (!token) {
+        setUser({
+          name: "Utkarsh",
+          email: "demo@test.com",
+          category: "student",
+          rank: 12,
+          totalTests: 15,
+          averageScore: 91,
+          skills: ["Logic", "Math", "Communication"],
+        });
+        return;
+      }
 
-  //   fetchProfile();
-  // }, [navigate]);
+      // ✅ If user already stored (fast load)
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+
+      // 🔐 Try fetching latest data from backend
+      const res = await apiCall("/auth/profile", { method: "GET" });
+
+      if (res.success) {
+        setUser(res.user);
+
+        // ✅ keep local copy updated
+        localStorage.setItem("user", JSON.stringify(res.user));
+      } else {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Dashboard error:", error);
+
+      // fallback to stored user
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        navigate("/login");
+      }
+    }
+  };
+
+  fetchProfile();
+}, [navigate]);
+
 
   if (!user) {
     return (
@@ -60,11 +87,6 @@ export default function Dashboard() {
     ["Leadership", 68],
   ];
 
-  const logout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   return (
     <main className="min-h-screen bg-gray-50 py-8 sm:py-10 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,16 +106,6 @@ export default function Dashboard() {
               Keep growing and track your progress in real time.
             </p>
           </div>
-
-          <div className="w-full sm:w-auto">
-            <Button
-              onClick={logout}
-              fullWidth
-              className="sm:w-auto"
-            >
-              Logout
-            </Button>
-          </div>
         </div>
 
         {/* Stats */}
@@ -109,6 +121,31 @@ export default function Dashboard() {
               </h3>
             </Card>
           ))}
+        </section>
+
+        {/* Start Exam Section */}
+        <section className="mt-8 sm:mt-10">
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+                  <Zap size={28} />
+                  Ready for a Challenge?
+                </h3>
+                <p className="mt-2 text-orange-100 text-sm sm:text-base">
+                  Take the next skill assessment and measure your growth
+                </p>
+              </div>
+              <Link to="/exam">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-orange-600 hover:bg-gray-100 whitespace-nowrap"
+                >
+                  Start Test
+                </Button>
+              </Link>
+            </div>
+          </Card>
         </section>
 
         {/* Main Content */}

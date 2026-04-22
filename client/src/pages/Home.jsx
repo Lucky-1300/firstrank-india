@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -20,6 +20,16 @@ import Card from "../components/Card";
 import Carousel from "../components/Carousel";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("authToken");
+
+  const handleStartTest = () => {
+    if (token) {
+      navigate("/exam");
+    } else {
+      navigate("/login");
+    }
+  };
   const heroSlides = useMemo(
     () => [
       {
@@ -145,11 +155,9 @@ export default function Home() {
                   </p>
 
                   <div className="mt-10 flex flex-wrap gap-4">
-                    <Link to="/exam">
-                      <Button size="lg">
-                        Start Test <ArrowRight size={18} />
-                      </Button>
-                    </Link>
+                    <Button size="lg" onClick={handleStartTest}>
+                      Start Test <ArrowRight size={18} />
+                    </Button>
 
                     <Link to="/leaderboard">
                       <Button variant="secondary" size="lg">
@@ -383,13 +391,13 @@ export default function Home() {
             Join thousands of students already ranking beyond marks.
           </p>
 
-          <div className="mt-10">
+          {/* <div className="mt-10">
             <Link to="/register">
               <Button size="lg" className="bg-white text-orange-500">
                 Start Free Test
               </Button>
             </Link>
-          </div>
+          </div> */}
         </div>
       </section>
     </main>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
+import { BookOpen, LayoutDashboard } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -39,6 +40,14 @@ const token = localStorage.getItem("authToken");
   localStorage.removeItem("user");
   navigate("/");
 };
+
+  const handleStartTest = () => {
+    if (token) {
+      navigate("/exam");
+    } else {
+      navigate("/login");
+    }
+  };
 
 
 
@@ -92,11 +101,38 @@ const token = localStorage.getItem("authToken");
 
         <div className="hidden lg:flex items-center gap-3">
   {token ? (
-    <Button size="sm" onClick={handleLogout}>
-      Logout
-    </Button>
+    <div className="flex items-center gap-3">
+      <Link to="/dashboard">
+        <Button variant="secondary" size="sm" className="flex items-center gap-2">
+          <LayoutDashboard size={16} />
+          Dashboard
+        </Button>
+      </Link>
+
+      <Button 
+        size="sm" 
+        onClick={handleStartTest}
+        className="flex items-center gap-2"
+      >
+        <BookOpen size={16} />
+        Start Test
+      </Button>
+
+      <Button size="sm" onClick={handleLogout}>
+        Logout
+      </Button>
+    </div>
   ) : (
-    <>
+    <div className="flex items-center gap-3">
+      <Button 
+        size="sm" 
+        onClick={handleStartTest}
+        className="flex items-center gap-2"
+      >
+        <BookOpen size={16} />
+        Start Test
+      </Button>
+
       <Link to="/login">
         <Button variant="secondary" size="sm">
           Sign In
@@ -106,7 +142,7 @@ const token = localStorage.getItem("authToken");
       <Link to="/register">
         <Button size="sm">Get Started</Button>
       </Link>
-    </>
+    </div>
   )}
 </div>
 
@@ -143,7 +179,7 @@ const token = localStorage.getItem("authToken");
         }`}
       >
         <div className="px-5 py-5 bg-white flex flex-col gap-1">
-          { navLinks.map((item) => (
+          {navLinks.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -155,25 +191,52 @@ const token = localStorage.getItem("authToken");
             </Link>
           ))}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-  {token ? (
-    <Button fullWidth onClick={handleLogout}>
-      Logout
-    </Button>
-  ) : (
-    <>
-      <Link to="/login">
-        <Button variant="secondary" fullWidth>
-          Sign In
-        </Button>
-      </Link>
+          <div className="space-y-2 pt-4 border-t border-gray-100 mt-4">
+            {token ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
+                    <LayoutDashboard size={16} />
+                    Dashboard
+                  </Button>
+                </Link>
 
-      <Link to="/register">
-        <Button fullWidth>Get Started</Button>
-      </Link>
-    </>
-  )}
-</div>
+                <Button 
+                  fullWidth 
+                  onClick={handleStartTest}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <BookOpen size={16} />
+                  Start Test
+                </Button>
+
+                <Button fullWidth onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  fullWidth 
+                  onClick={handleStartTest}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <BookOpen size={16} />
+                  Start Test
+                </Button>
+
+                <Link to="/login">
+                  <Button variant="secondary" fullWidth>
+                    Sign In
+                  </Button>
+                </Link>
+
+                <Link to="/register">
+                  <Button fullWidth>Get Started</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>

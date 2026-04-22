@@ -56,7 +56,11 @@ if (formData.password.length < 8) {
       if (res.success) {
         localStorage.setItem("authToken", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        navigate("/");
+        
+        // Redirect to the intended page or dashboard
+        const redirectPath = localStorage.getItem("redirectAfterLogin");
+        localStorage.removeItem("redirectAfterLogin"); // Clean up
+        navigate(redirectPath || "/dashboard");
       } else {
         setErrors({ password: res.message || "Login failed" });
       }
