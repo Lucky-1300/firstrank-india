@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-saffron-300: #FFB266;
@@ -21,8 +22,23 @@ html {
   scroll-behavior: smooth;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   background: white;
   color: #111827;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+html.dark body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+::selection {
+  background: rgba(249, 115, 22, 0.25);
+  color: inherit;
 }

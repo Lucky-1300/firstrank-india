@@ -12,6 +12,13 @@ import Exam from '../pages/Exam';
 import Result from '../pages/Result';
 import Leaderboard from '../pages/Leaderboard';
 import AdminDashboard from '../pages/AdminDashboard';
+import MyProfile from '../pages/MyProfile';
+import Settings from '../pages/Settings';
+import About from '../pages/About';
+import Features from '../pages/Features';
+import HowItWorks from '../pages/HowItWorks';
+import Pricing from '../pages/Pricing';
+import Contact from '../pages/Contact';
 // import Institutions from '../pages/Institutions';
 // import News from '../pages/News';
 // import About from '../pages/About';
@@ -22,6 +29,11 @@ export default function AppRoutes() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* <Route path="/dashboard" element={<Dashboard />} />
@@ -70,6 +82,24 @@ export default function AppRoutes() {
   element={
     <ProtectedRoute>
       <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <MyProfile />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/settings"
+  element={
+    <ProtectedRoute>
+      <Settings />
     </ProtectedRoute>
   }
 />
