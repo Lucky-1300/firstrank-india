@@ -1,24 +1,58 @@
 import Question from "../models/question.model.js";
 
+// GET QUESTIONS (Day 6/7)
 const fetchQuestions = async () => {
-  // 1. Fetch all questions
   let questions = await Question.find();
 
-  // 2. Shuffle questions (random order)
+  // ✅ remove invalid questions (VERY IMPORTANT)
+  questions = questions.filter(
+    (q) => q.options && q.options.length > 0
+  );
+
+  // shuffle
   questions = questions.sort(() => Math.random() - 0.5);
 
-  // 3. Limit to 50 questions
+  // limit
   questions = questions.slice(0, 50);
 
-  // 4. Hide correct answers
+  // hide correct answers
   const safeQuestions = questions.map((q) => ({
     _id: q._id,
     question: q.question,
     options: q.options,
-    // correctAnswer is NOT sent
+    category: q.category,
+    difficulty: q.difficulty,
   }));
 
   return safeQuestions;
 };
 
-export { fetchQuestions };
+// EVALUATE EXAM (Day 8/9 🔥)
+const evaluateExam = async (answers) => {
+  let score = 0;
+  let categoryScore = {};
+
+  for (const ans of answers) {
+    const question = await Question.findById(ans.questionId);
+
+    if (!question) continue;
+
+    // total score
+    if (question.correctAnswer === ans.selectedOption) {
+      score++;
+
+      // category-wise score
+      const category = question.category || "General";
+
+      categoryScore[category] = (categoryScore[category] || 0) + 1;
+    }
+  }
+
+  return {
+    score,
+    total: answers.length,
+    categoryScore,
+  };
+};
+
+export { fetchQuestions, evaluateExam };
