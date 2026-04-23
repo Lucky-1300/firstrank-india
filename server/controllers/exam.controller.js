@@ -1,4 +1,5 @@
 import { fetchQuestions, evaluateExam } from "../services/exam.service.js";
+import Response from "../models/response.model.js";
 
 // GET QUESTIONS (Day 6/7)
 const getQuestions = async (req, res) => {
@@ -32,10 +33,19 @@ const submitExam = async (req, res) => {
 
     const result = await evaluateExam(answers);
 
+    // 🔥 SAVE RESULT IN DATABASE (THIS IS THE MISSING PART)
+    await Response.create({
+      userId: req.user?.id || null,
+      answers,
+      score: result.score,
+      categoryScore: result.categoryScore,
+    });
+
     res.status(200).json({
       success: true,
       ...result,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

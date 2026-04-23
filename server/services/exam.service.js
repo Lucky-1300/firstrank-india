@@ -32,18 +32,22 @@ const evaluateExam = async (answers) => {
   let score = 0;
   let categoryScore = {};
 
+  console.log("ANSWERS FROM FRONTEND:", answers);
+
   for (const ans of answers) {
     const question = await Question.findById(ans.questionId);
 
-    if (!question) continue;
 
-    // total score
-    if (question.correctAnswer === ans.selectedOption) {
+
+    if (!question) {
+     
+      continue;
+    }
+
+    if (String(question.correctAnswer).trim() === String(ans.selectedOption).trim()) {
       score++;
 
-      // category-wise score
-      const category = question.category || "General";
-
+      const category = question.category;
       categoryScore[category] = (categoryScore[category] || 0) + 1;
     }
   }
@@ -54,5 +58,4 @@ const evaluateExam = async (answers) => {
     categoryScore,
   };
 };
-
 export { fetchQuestions, evaluateExam };
