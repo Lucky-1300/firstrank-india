@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "Day6 Exam API Tests",
+    "description": "Test GET /api/exam/questions with validation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Questions API",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/exam/questions",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "exam", "questions"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success true', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "});",
+              "",
+              "pm.test('Questions array exists', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('Questions are limited (<= 50)', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.length).to.be.at.most(50);",
+              "});",
+              "",
+              "pm.test('Answers are hidden', function () {",
+              "    const jsonData = pm.response.json();",
+              "    jsonData.data.forEach(q => {",
+              "        pm.expect(q).to.not.have.property('correctAnswer');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

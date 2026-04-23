@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.routes");
+const examRoutes = require("./routes/exam.routes"); // ✅ ADD THIS
 
 const app = express();
 
@@ -17,36 +18,30 @@ app.get("/api/test", (req, res) => {
   res.send("API is working ");
 });
 
-
-
-//register APp
+// register API
 app.post("/register", (req, res) => {
-
   const { name, email, password } = req.body;
 
   res.json({
     message: "User registered successfully",
-    user: { name, email }
+    user: { name, email },
   });
-
 });
 
 // login API
 app.post("/login", (req, res) => {
-
   const { email, password } = req.body;
 
   res.json({
     message: "Login successful",
-    token: "demo_token_123"
+    token: "demo_token_123",
   });
-
 });
 
-
-
-
-//auth route 
+// auth routes
 app.use("/api/auth", authRoutes);
+
+// ✅ exam routes (IMPORTANT)
+app.use("/api/exam", examRoutes);
 
 module.exports = app;
