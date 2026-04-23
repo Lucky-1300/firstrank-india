@@ -9,49 +9,54 @@ const STORAGE_KEY = "examState";
 export default function Exam() {
   const navigate = useNavigate();
 
-  const questions = [
-    {
-      id: 1,
-      question: "What is 15% of 480?",
-      options: ["70", "72", "75", "78"],
-      answer: 1,
-    },
-    {
-      id: 2,
-      question: "If a train travels 60 km/hr, how far in 2.5 hours?",
-      options: ["120 km", "140 km", "150 km", "160 km"],
-      answer: 2,
-    },
-    {
-      id: 3,
-      question: "Choose the synonym of Rapid",
-      options: ["Slow", "Fast", "Weak", "Cold"],
-      answer: 1,
-    },
-  ];
+  
+  const [questions, setQuestions] = useState([]);
+
+
+
 
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [deadline, setDeadline] = useState(null);
   const [timeLeft, setTimeLeft] = useState(1800);
 
+
+// FETCH QUESTIONS
+useEffect(() => {
+  fetch("http://localhost:3000/api/exam/questions")
+    .then((res) => res.json())
+    .then((data) => {
+      setQuestions(data.data);
+    })
+    .catch((err) => console.log(err));
+}, []);
+
+
+
+
   // LOAD STATE
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-    if (saved) {
-      setAnswers(saved.answers || {});
-      setCurrent(saved.current || 0);
-      setDeadline(saved.deadline);
-    } else {
-      const newDeadline = Date.now() + 1800 * 1000;
-      setDeadline(newDeadline);
-    }
-  }, []);
+  
+  if (saved && saved.deadline) {
+  setAnswers(saved.answers || {});
+  setCurrent(saved.current || 0);
+  setDeadline(saved.deadline);
+
+  const remaining = Math.floor((saved.deadline - Date.now()) / 1000);
+  setTimeLeft(remaining);
+} else {
+  const newDeadline = Date.now() + 1800 * 1000;
+  setDeadline(newDeadline);
+}}, []);
 
   // TIMER
   useEffect(() => {
     if (!deadline) return;
+
+
+    setTimeLeft(Math.floor((deadline - Date.now()) / 1000));
 
     const timer = setInterval(() => {
       const remaining = Math.max(
@@ -87,16 +92,41 @@ export default function Exam() {
     setAnswers((prev) => ({ ...prev, [qIndex]: optionIndex }));
   };
 
+
+
+  const correctAnswers = [0,3,1,1,2,2,0,2,2,1,1,1,1,1,2,2,1,0,1,0,1,1,1,3,1,1,1,1,1];
   const calculateScore = () => {
     let score = 0;
     questions.forEach((q, i) => {
-      if (answers[i] === q.answer) score++;
+      // if (answers[i] === q.answer) score++;
+      // if (answers[i] === correctAnswers[i]) score++;
+      if (Number(answers[i]) === correctAnswers[i]) score++;
     });
     return Math.round((score / questions.length) * 100);
   };
 
   const submitExam = () => {
     const score = calculateScore();
+
+fetch("http://localhost:3000/api/exam/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  
+  body: JSON.stringify({
+  answers:questions.map((_, i) =>
+  answers[i] !== undefined ? answers[i] + 1 : -1
+),
+  score,
+})
+})
+  .then((res) => res.json())
+  .then((data) => {
+    console.log("Submit response:", data);
+  })
+  .catch((err) => console.log(err));
+
 
     localStorage.removeItem(STORAGE_KEY);
 
@@ -143,15 +173,16 @@ export default function Exam() {
           <Card className="bg-white shadow-md">
             <div className="border-b border-gray-200 pb-4 mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-relaxed">
-                {questions[current].question}
+                {/* {questions[current].question} */}
+                {questions[current]?.question}
               </h2>
             </div>
 
             {/* Options with Radio Style */}
             <div className="space-y-3 mb-8">
-              {questions[current].options.map((opt, i) => {
+              {questions[current]?.options.map((opt, i) => {
                 const selected = answers[current] === i;
-                const isCorrect = questions[current].answer === i;
+                const isCorrect = questions[current]?.answer === i;
 
                 return (
                   <label
