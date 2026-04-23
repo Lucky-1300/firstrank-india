@@ -1,24 +1,36 @@
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, TrendingUp, Zap, Award } from "lucide-react";
+import {
+  Trophy,
+  TrendingUp,
+  Zap,
+  Award,
+  MapPin,
+  Star,
+  BarChart3,
+  Brain,
+  Users,
+  Target,
+} from "lucide-react";
 
 export default function Result() {
   const location = useLocation();
-  const score = location.state?.score || 92;
+  const score = location.state?.score || 78;
+  const studentName = location.state?.studentName || "Utkarsh";
 
   const skills = [
-    ["Problem Solving", 85],
-    ["Logical Reasoning", 92],
-    ["Communication", 74],
-    ["Critical Thinking", 88],
+    ["Logic", 85],
+    ["Decision Making", 92],
+    ["Finance", 74],
+    ["Leadership", 88],
   ];
 
   const stats = [
-    { label: "National Rank", value: "#5", icon: Trophy },
-    { label: "Percentile", value: "95%", icon: Award },
-    { label: "Questions Correct", value: "23/25", icon: TrendingUp },
-    { label: "Time Used", value: "24 min", icon: Zap },
+    { label: "City Rank", value: "#2", icon: MapPin },
+    { label: "State Rank", value: "#9", icon: Trophy },
+    { label: "National Rank", value: "#18", icon: Award },
+    { label: "Percentile", value: "95%", icon: TrendingUp },
   ];
 
   const careers = [
@@ -28,9 +40,32 @@ export default function Result() {
     "Business Strategist",
   ];
 
+  const reportCards = [
+    {
+      icon: Brain,
+      title: "Personality Insight",
+      text: "You think clearly under pressure and perform well in structured challenges.",
+    },
+    {
+      icon: Users,
+      title: "Team Strength",
+      text: "You communicate effectively and can influence group decisions positively.",
+    },
+    {
+      icon: Target,
+      title: "Growth Area",
+      text: "Your financial reasoning can improve further with regular practice.",
+    },
+    {
+      icon: BarChart3,
+      title: "Overall Trend",
+      text: "Your score shows strong potential for leadership and analytical roles.",
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 sm:py-10 lg:py-14">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 sm:py-10 lg:py-14 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <section className="text-center mb-8 sm:mb-10">
@@ -39,32 +74,33 @@ export default function Result() {
           </p>
 
           <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">
-            🎉 Test Completed
+            🎉 Report for {studentName}
           </h1>
 
-          <p className="mt-4 text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-sm sm:text-lg text-gray-600 dark:text-slate-300 max-w-2xl mx-auto transition-colors duration-300">
             Congratulations! Here is your detailed performance report and insights.
           </p>
         </section>
 
         {/* Score Card - Hero Section */}
         <section className="mb-8 sm:mb-10">
-          <Card className="text-center bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-white py-10 sm:py-14 shadow-lg">
-            <p className="text-sm sm:text-base opacity-90 uppercase tracking-widest">
+          <Card className="relative overflow-hidden text-center bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-white py-10 sm:py-14 shadow-lg border-0 hover:shadow-2xl transition-all duration-300">
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_white,_transparent_40%)]" />
+            <p className="relative text-sm sm:text-base opacity-90 uppercase tracking-widest">
               Your Final Score
             </p>
 
-            <h2 className="mt-6 text-7xl sm:text-8xl font-black">
-              {score}%
+            <h2 className="relative mt-6 text-7xl sm:text-8xl font-black">
+              {score}/100
             </h2>
 
-            <div className="mt-6 space-y-3">
+            <div className="relative mt-6 space-y-3">
               <p className="text-base sm:text-lg opacity-95">
-                ✓ Higher than 95% of students
+                Strong performance across logic, decision making and leadership.
               </p>
 
               <div className="inline-block px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 font-semibold">
-                🏆 Rank #5 Nationally
+                🏆 National Rank #18
               </div>
             </div>
           </Card>
@@ -73,11 +109,11 @@ export default function Result() {
         {/* Stats Grid */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
           {stats.map(({ label, value, icon: Icon }, i) => (
-            <Card key={i} className="text-center hover:shadow-md transition-shadow">
+            <Card key={i} className={`text-center hover:shadow-md transition-all duration-300 ${label === "National Rank" ? "ring-2 ring-orange-300 bg-orange-50 dark:bg-orange-500/10" : ""}`}>
               <div className="flex justify-center mb-3">
                 <Icon className="text-orange-500" size={24} />
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 font-medium">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-300 font-medium transition-colors duration-300">
                 {label}
               </p>
               <h3 className="mt-2 text-2xl sm:text-3xl font-black text-orange-600">
@@ -87,14 +123,39 @@ export default function Result() {
           ))}
         </section>
 
+        {/* Rank Section */}
+        <section className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          {[
+            ["City Rank", "#2", "You are among the top students in your city.", false],
+            ["State Rank", "#9", "You are in the top group across your state.", false],
+            ["National Rank", "#18", "Your current national rank is highlighted here.", true],
+          ].map(([label, value, text, highlight]) => (
+            <Card
+              key={label}
+              className={`relative overflow-hidden hover:shadow-lg transition-all duration-300 ${highlight ? "bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg" : ""}`}
+            >
+              {highlight && <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_top_right,_white,_transparent_45%)]" />}
+              <p className={`text-sm font-semibold uppercase tracking-widest ${highlight ? "text-white/80" : "text-gray-500 dark:text-slate-400"}`}>
+                {label}
+              </p>
+              <h3 className={`mt-3 text-4xl font-black ${highlight ? "text-white" : "text-orange-600"}`}>
+                {value}
+              </h3>
+              <p className={`mt-3 text-sm leading-7 ${highlight ? "text-white/90" : "text-gray-600 dark:text-slate-300"}`}>
+                {text}
+              </p>
+            </Card>
+          ))}
+        </section>
+
         {/* Skills & Careers Grid */}
         <section className="grid lg:grid-cols-2 gap-6 mb-8 sm:mb-10">
 
           {/* Skill Breakdown */}
-          <Card>
+          <Card className="shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <TrendingUp className="text-orange-500" size={24} />
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
                 Skill Breakdown
               </h3>
             </div>
@@ -110,7 +171,7 @@ export default function Result() {
                       {value}%
                     </span>
                   </div>
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden transition-colors duration-300">
                     <div
                       className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500"
                       style={{ width: `${value}%` }}
@@ -122,10 +183,10 @@ export default function Result() {
           </Card>
 
           {/* Career Recommendations */}
-          <Card>
+          <Card className="shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <Award className="text-orange-500" size={24} />
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
                 Recommended Careers
               </h3>
             </div>
@@ -134,20 +195,42 @@ export default function Result() {
               {careers.map((career, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200 hover:border-orange-300 transition"
+                  className="flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-500/10 rounded-lg border border-orange-200 dark:border-orange-500/20 hover:border-orange-300 transition-all duration-300"
                 >
                   <div className="w-3 h-3 rounded-full bg-orange-500" />
-                  <span className="font-medium text-gray-800 text-sm sm:text-base">
+                  <span className="font-medium text-gray-800 dark:text-slate-100 text-sm sm:text-base transition-colors duration-300">
                     {career}
                   </span>
                 </div>
               ))}
             </div>
 
-            <p className="mt-4 text-xs sm:text-sm text-gray-500">
+              <p className="mt-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 transition-colors duration-300">
               These careers align with your skill strengths
             </p>
           </Card>
+        </section>
+
+        {/* Detailed Report Cards */}
+        <section className="mb-8 sm:mb-10">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {reportCards.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <Card key={i} hover className="h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center">
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-gray-600 dark:text-slate-300 transition-colors duration-300">
+                    {item.text}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
         </section>
 
         {/* Action Buttons */}

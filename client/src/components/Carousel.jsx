@@ -5,6 +5,7 @@ export default function Carousel({
   items,
   autoPlay = true,
   interval = 5000,
+  showArrows = true,
 }) {
   const [current, setCurrent] = useState(0);
 
@@ -41,21 +42,25 @@ export default function Carousel({
         ))}
       </div>
 
-      {/* Left */}
-      <button
-        onClick={prev}
-        className="absolute left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
-      >
-        <ChevronLeft size={22} />
-      </button>
+      {showArrows && (
+        <>
+          {/* Left */}
+          <button
+            onClick={prev}
+            className="absolute left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
+          >
+            <ChevronLeft size={22} />
+          </button>
 
-      {/* Right */}
-      <button
-        onClick={next}
-        className="absolute right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
-      >
-        <ChevronRight size={22} />
-      </button>
+          {/* Right */}
+          <button
+            onClick={next}
+            className="absolute right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
+          >
+            <ChevronRight size={22} />
+          </button>
+        </>
+      )}
 
       {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">

@@ -10,9 +10,8 @@ import {
   BookOpen,
   Star,
   ArrowRight,
-  BarChart3,
   Rocket,
-  Medal,
+  Lock,
 } from "lucide-react";
 
 import Button from "../components/Button";
@@ -119,9 +118,9 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-white overflow-hidden">
+    <main className="bg-white dark:bg-slate-950 dark:text-slate-100 overflow-hidden transition-colors duration-300">
       {/* HERO */}
-      <section className="relative px-6 pt-8 pb-20 bg-gradient-to-br from-orange-50 via-white to-orange-100">
+      <section className="relative px-6 pt-8 pb-20 bg-gradient-to-br from-orange-50 via-white to-orange-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <Carousel
             items={heroSlides.map((slide, i) => (
@@ -137,12 +136,12 @@ export default function Home() {
                   variants={fadeUp}
                   transition={{ duration: 0.7 }}
                 >
-                  <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-orange-100 text-orange-600 font-medium mb-6">
+                  <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-orange-100 dark:bg-orange-500/10 text-orange-600 dark:text-orange-300 font-medium mb-6 transition-colors duration-300">
                     <Sparkles size={16} />
                     {slide.badge}
                   </div>
 
-                  <h1 className="text-5xl md:text-7xl font-black leading-tight text-gray-900">
+                  <h1 className="text-5xl md:text-7xl font-black leading-tight text-gray-900 dark:text-white transition-colors duration-300">
                     {slide.title1}
                     <br />
                     <span className="text-orange-500">{slide.highlight}</span>
@@ -150,20 +149,21 @@ export default function Home() {
                     {slide.title2}
                   </h1>
 
-                  <p className="mt-7 text-xl text-gray-600 leading-9 max-w-xl">
+                  <p className="mt-7 text-xl text-gray-600 dark:text-slate-300 leading-9 max-w-xl transition-colors duration-300">
                     {slide.desc}
                   </p>
 
                   <div className="mt-10 flex flex-wrap gap-4">
                     <Button size="lg" onClick={handleStartTest}>
-                      Start Test <ArrowRight size={18} />
+                      Start Free Test <ArrowRight size={18} />
                     </Button>
 
-                    <Link to="/leaderboard">
-                      <Button variant="secondary" size="lg">
-                        <Trophy size={18} />
-                        View Rankings
-                      </Button>
+                    <Link
+                      to="/#how-it-works"
+                      className="inline-flex items-center justify-center rounded-full border border-orange-500 px-8 py-4 text-base font-semibold text-orange-600 hover:bg-orange-50 transition-all duration-300"
+                    >
+                      <ChevronRight size={18} />
+                      <span className="ml-2">How It Works</span>
                     </Link>
                   </div>
 
@@ -177,7 +177,7 @@ export default function Home() {
                       ))}
                     </div>
 
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-slate-300 transition-colors duration-300">
                       Trusted by <b>50,000+</b> students
                     </p>
                   </div>
@@ -190,32 +190,32 @@ export default function Home() {
                   transition={{ duration: 0.8 }}
                   className="relative"
                 >
-                  <div className="bg-white rounded-[2rem] shadow-2xl p-8 border border-orange-100">
-                    <div className="h-[520px] rounded-[2rem] bg-gradient-to-br from-orange-50 to-white flex items-center justify-center relative overflow-hidden">
-                      <img
-                        src="/hero.png"
-                        alt="hero"
-                        className="w-full h-full object-cover opacity-95"
-                      />
+                  <div className="relative h-[560px] overflow-hidden transition-colors duration-300">
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-orange-50/70 via-white/30 to-orange-100/50 blur-3xl dark:from-slate-800/30 dark:via-slate-900/10 dark:to-slate-950/20" />
 
-                      <motion.div
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ repeat: Infinity, duration: 3 }}
-                        className="absolute top-10 left-0 bg-white shadow-xl px-5 py-4 rounded-2xl"
-                      >
-                        <p className="text-gray-500 text-sm">Your Rank</p>
-                        <p className="font-bold text-xl">#12 National</p>
-                      </motion.div>
+                    <img
+                      src="/hero.png"
+                      alt="hero"
+                      className="relative z-10 w-full h-full object-contain opacity-95"
+                    />
 
-                      <motion.div
-                        animate={{ y: [0, 12, 0] }}
-                        transition={{ repeat: Infinity, duration: 3 }}
-                        className="absolute bottom-12 right-0 bg-white shadow-xl px-5 py-4 rounded-2xl"
-                      >
-                        <p className="text-gray-500 text-sm">Skill Score</p>
-                        <p className="font-bold text-xl">87 / 100</p>
-                      </motion.div>
-                    </div>
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ repeat: Infinity, duration: 3 }}
+                      className="absolute top-10 left-0 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-5 py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                    >
+                      <p className="text-gray-500 dark:text-slate-400 text-sm">Your Rank</p>
+                      <p className="font-bold text-xl text-gray-900 dark:text-white">#12 National</p>
+                    </motion.div>
+
+                    <motion.div
+                      animate={{ y: [0, 12, 0] }}
+                      transition={{ repeat: Infinity, duration: 3 }}
+                      className="absolute bottom-12 right-0 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-5 py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                    >
+                      <p className="text-gray-500 dark:text-slate-400 text-sm">Skill Score</p>
+                      <p className="font-bold text-xl text-gray-900 dark:text-white">87 / 100</p>
+                    </motion.div>
                   </div>
                 </motion.div>
               </div>
@@ -224,8 +224,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="px-6 -mt-10 relative z-10">
+      {/* ABOUT / FEATURES */}
+      <section id="about" className="px-6 -mt-10 relative z-10 py-16">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-5">
           {[
             ["50K+", "Students Assessed"],
@@ -233,28 +233,28 @@ export default function Home() {
             ["98%", "Satisfaction Rate"],
             ["15+", "Skill Categories"],
           ].map((item, i) => (
-            <Card key={i} className="text-center">
+            <Card key={i} className="text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <h3 className="text-3xl font-black text-orange-500">
                 {item[0]}
               </h3>
-              <p className="text-gray-600 mt-2">{item[1]}</p>
+              <p className="text-gray-600 dark:text-slate-300 mt-2 transition-colors duration-300">{item[1]}</p>
             </Card>
           ))}
         </div>
       </section>
 
       {/* PLATFORM */}
-      <section className="py-24 px-6">
+      <section id="features" className="py-24 px-6">
         <div className="max-w-7xl mx-auto text-center">
-          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500">
+          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Our Platform
           </span>
 
-          <h2 className="text-5xl font-black mt-6">
+          <h2 className="text-5xl font-black mt-6 text-gray-900 dark:text-white transition-colors duration-300">
             Everything you need to excel
           </h2>
 
-          <p className="mt-5 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-5 text-xl text-gray-600 dark:text-slate-300 max-w-3xl mx-auto transition-colors duration-300">
             Comprehensive tools designed to evaluate, rank and guide students
             based on real skills.
           </p>
@@ -265,16 +265,16 @@ export default function Home() {
               return (
                 <motion.div
                   key={i}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -8, scale: 1.01 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Card className="h-full text-left">
+                  <Card className="h-full text-left hover:shadow-xl transition-all duration-300">
                     <div className="w-14 h-14 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center">
                       <Icon size={28} />
                     </div>
 
-                    <h3 className="text-2xl font-bold mt-6">{item.title}</h3>
-                    <p className="text-gray-600 mt-4 leading-8">
+                    <h3 className="text-2xl font-bold mt-6 text-gray-900 dark:text-white transition-colors duration-300">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-slate-300 mt-4 leading-8 transition-colors duration-300">
                       {item.desc}
                     </p>
                   </Card>
@@ -286,22 +286,22 @@ export default function Home() {
       </section>
 
       {/* WHY */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
-          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500">
+          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Why Choose Us
           </span>
 
-          <h2 className="text-5xl font-black mt-6">
+          <h2 className="text-5xl font-black mt-6 text-gray-900 dark:text-white transition-colors duration-300">
             Built for the future of education
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7 mt-14">
             {whyChoose.map((item, i) => (
-              <Card key={i}>
+              <Card key={i} hover>
                 <Star className="text-orange-500" />
-                <h3 className="text-2xl font-bold mt-5">{item}</h3>
-                <p className="text-gray-600 mt-3">
+                <h3 className="text-2xl font-bold mt-5 text-gray-900 dark:text-white transition-colors duration-300">{item}</h3>
+                <p className="text-gray-600 dark:text-slate-300 mt-3 transition-colors duration-300">
                   Modern learning tools built to help every student grow faster.
                 </p>
               </Card>
@@ -310,14 +310,59 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PREMIUM LOCKED */}
+      <section id="pricing" className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <div>
+              <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
+                Premium Preview
+              </span>
+              <h2 className="text-4xl font-black mt-5 text-gray-900 dark:text-white transition-colors duration-300">
+                Locked insights for premium users
+              </h2>
+            </div>
+            <Button className="hidden md:inline-flex items-center gap-2">
+              <Lock size={16} />
+              Unlock Premium
+            </Button>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {[
+              ["Career Blueprint", "Detailed roadmap to your ideal career path."],
+              ["Scholarship Match", "Find opportunities based on your strength profile."],
+              ["Deep Analytics", "See hidden patterns in your performance data."],
+            ].map(([title, desc], i) => (
+              <Card key={i} className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-14 h-14 mx-auto rounded-full bg-orange-500 text-white flex items-center justify-center shadow-lg">
+                      <Lock size={20} />
+                    </div>
+                    <p className="mt-3 font-bold text-gray-900 dark:text-white">Locked</p>
+                  </div>
+                </div>
+
+                <div className="opacity-30 select-none">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h3>
+                  <p className="mt-3 text-gray-600 dark:text-slate-300 leading-7">{desc}</p>
+                  <div className="mt-6 h-32 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-50 dark:from-slate-800 dark:to-slate-700" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HOW */}
-      <section className="py-24 px-6">
+      <section id="how-it-works" className="py-24 px-6">
         <div className="max-w-6xl mx-auto text-center">
-          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500">
+          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             How It Works
           </span>
 
-          <h2 className="text-5xl font-black mt-6">
+          <h2 className="text-5xl font-black mt-6 text-gray-900 dark:text-white transition-colors duration-300">
             Three simple steps to your rank
           </h2>
 
@@ -327,11 +372,11 @@ export default function Home() {
               ["Get Your Analysis", Brain],
               ["Claim Your Rank", Trophy],
             ].map(([title, Icon], i) => (
-              <Card key={i}>
+              <Card key={i} hover>
                 <div className="w-16 h-16 rounded-2xl bg-orange-500 text-white flex items-center justify-center mx-auto">
                   <Icon size={30} />
                 </div>
-                <h3 className="text-2xl font-bold mt-6">{title}</h3>
+                <h3 className="text-2xl font-bold mt-6 text-gray-900 dark:text-white transition-colors duration-300">{title}</h3>
               </Card>
             ))}
           </div>
@@ -339,23 +384,23 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
-          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500">
+          <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Testimonials
           </span>
 
-          <h2 className="text-5xl font-black mt-6">
+          <h2 className="text-5xl font-black mt-6 text-gray-900 dark:text-white transition-colors duration-300">
             What students are saying
           </h2>
 
           <div className="grid md:grid-cols-3 gap-7 mt-14">
             {testimonials.map((item, i) => (
-              <Card key={i}>
+              <Card key={i} hover>
                 <div className="text-orange-400">★★★★★</div>
-                <p className="text-gray-700 mt-5 leading-8">{item.text}</p>
-                <h4 className="font-bold mt-6">{item.name}</h4>
-                <p className="text-gray-500 text-sm">{item.city}</p>
+                <p className="text-gray-700 dark:text-slate-300 mt-5 leading-8 transition-colors duration-300">{item.text}</p>
+                <h4 className="font-bold mt-6 text-gray-900 dark:text-white transition-colors duration-300">{item.name}</h4>
+                <p className="text-gray-500 dark:text-slate-400 text-sm transition-colors duration-300">{item.city}</p>
               </Card>
             ))}
           </div>
@@ -365,15 +410,15 @@ export default function Home() {
       {/* TECH */}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <h3 className="text-2xl font-semibold text-gray-700">
+          <h3 className="text-2xl font-semibold text-gray-700 dark:text-slate-300 transition-colors duration-300">
             Powered by modern technology
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
             {["React", "Node.js", "MongoDB", "Razorpay"].map((item, i) => (
-              <Card key={i} className="text-center py-8">
+              <Card key={i} className="text-center py-8 hover:shadow-lg transition-all duration-300">
                 <Rocket className="mx-auto text-orange-500" />
-                <p className="mt-4 font-semibold">{item}</p>
+                <p className="mt-4 font-semibold text-gray-900 dark:text-white transition-colors duration-300">{item}</p>
               </Card>
             ))}
           </div>
@@ -381,8 +426,8 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 pb-24">
-        <div className="max-w-7xl mx-auto rounded-[2rem] bg-gradient-to-r from-orange-500 to-orange-400 text-white text-center py-20 px-6 shadow-2xl">
+      <section id="contact" className="px-6 pb-24">
+        <div className="max-w-7xl mx-auto rounded-[2rem] bg-gradient-to-r from-orange-500 to-orange-400 text-white text-center py-20 px-6 shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
           <h2 className="text-5xl font-black">
             Ready to discover your true potential?
           </h2>
@@ -391,13 +436,19 @@ export default function Home() {
             Join thousands of students already ranking beyond marks.
           </p>
 
-          {/* <div className="mt-10">
+          <div className="mt-10 flex justify-center gap-4 flex-wrap">
             <Link to="/register">
-              <Button size="lg" className="bg-white text-orange-500">
+              <Button size="lg" className="bg-white text-orange-500 hover:bg-orange-50">
                 Start Free Test
               </Button>
             </Link>
-          </div> */}
+            <Link
+              to="/#about"
+              className="inline-flex items-center justify-center rounded-full border border-white px-8 py-4 text-base font-semibold text-white hover:bg-white/10 transition-all duration-300"
+            >
+              Learn More
+            </Link>
+          </div>
         </div>
       </section>
     </main>
