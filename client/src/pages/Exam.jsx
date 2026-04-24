@@ -132,24 +132,28 @@ useEffect(() => {
   const submitExam = () => {
     const score = calculateScore();
 
-fetch("http://localhost:3000/api/exam/submit", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  
-  body: JSON.stringify({
-  answers:questions.map((_, i) =>
-  answers[i] !== undefined ? answers[i] + 1 : -1
-),
-  score,
-})
-})
-  .then((res) => res.json())
-  .then((data) => {
-    console.log("Submit response:", data);
-  })
-  .catch((err) => console.log(err));
+    const payload = {
+      answers: questions.map((question, i) => ({
+        questionId: question._id,
+        selectedOption:
+          answers[i] !== undefined ? question.options[answers[i]] : "",
+      })),
+      score,
+      timeTaken: 1800 - timeLeft,
+    };
+
+    fetch("http://localhost:3000/api/exam/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Submit response:", data);
+      })
+      .catch((err) => console.log(err));
 
 
     localStorage.removeItem(STORAGE_KEY);

@@ -29,33 +29,66 @@ const fetchQuestions = async () => {
 
 // EVALUATE EXAM (Day 8/9 🔥)
 const evaluateExam = async (answers) => {
-  let score = 0;
-  let categoryScore = {};
-
-  console.log("ANSWERS FROM FRONTEND:", answers);
+  let correctCount = 0;
+  let evaluatedCount = 0;
+  const sectionScores = {};
 
   for (const ans of answers) {
-    const question = await Question.findById(ans.questionId);
-
-
-
-    if (!question) {
-     
+    const questionId = ans?.questionId;
+    if (!questionId) {
       continue;
     }
 
-    if (String(question.correctAnswer).trim() === String(ans.selectedOption).trim()) {
-      score++;
+    const question = await Question.findById(questionId);
+    if (!question) {
+      continue;
+    }
 
-      const category = question.category;
-      categoryScore[category] = (categoryScore[category] || 0) + 1;
+    const section = question.category || "Uncategorized";
+
+    if (!sectionScores[section]) {
+      sectionScores[section] = {
+        correct: 0,
+        total: 0,
+        attempted: 0,
+        score: 0,
+        percentage: 0,
+      };
+    }
+
+    evaluatedCount += 1;
+    sectionScores[section].total += 1;
+
+    const selectedOption = String(ans.selectedOption ?? "").trim();
+    const correctAnswer = String(question.correctAnswer ?? "").trim();
+    const attempted = selectedOption.length > 0;
+
+    if (attempted) {
+      sectionScores[section].attempted += 1;
+    }
+
+    if (selectedOption === correctAnswer) {
+      correctCount += 1;
+      sectionScores[section].correct += 1;
     }
   }
 
+  for (const section of Object.keys(sectionScores)) {
+    const sectionResult = sectionScores[section];
+    sectionResult.score = sectionResult.correct;
+    sectionResult.percentage = sectionResult.total
+      ? Math.round((sectionResult.correct / sectionResult.total) * 100)
+      : 0;
+  }
+
   return {
-    score,
-    total: answers.length,
-    categoryScore,
+    score: evaluatedCount ? Math.round((correctCount / evaluatedCount) * 100) : 0,
+    correctCount,
+    total: evaluatedCount,
+    sectionScores,
+    categoryScore: Object.fromEntries(
+      Object.entries(sectionScores).map(([section, value]) => [section, value.correct])
+    ),
   };
 };
 export { fetchQuestions, evaluateExam };

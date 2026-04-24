@@ -7,6 +7,7 @@ const fetchUserResult = async (req, res) => {
 
 		return res.status(200).json({
 			success: true,
+			message: "User result fetched successfully",
 			data: result,
 		});
 	} catch (error) {

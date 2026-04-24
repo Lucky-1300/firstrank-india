@@ -3,7 +3,7 @@ import { login, register } from "../services/auth.service.js";
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, mobile } = req.body;
+    const { name, email, password, mobile, city, state } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -12,7 +12,7 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const result = await register({ name, email, password, mobile });
+    const result = await register({ name, email, password, mobile, city, state });
 
     return res.status(201).json({
       success: true,

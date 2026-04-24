@@ -37,18 +37,22 @@ const submitExam = async (req, res) => {
     await Result.create({
       userId: req.body.userId || req.user?.id || null,
       answers,
+      correctCount: result.correctCount,
       score: result.score,
       total: result.total,
+      timeTaken: req.body.timeTaken || 0,
+      sectionScores: result.sectionScores,
       categoryScore: result.categoryScore,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      ...result,
+      message: "Exam evaluated successfully",
+      data: result,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || "Error evaluating exam",
     });

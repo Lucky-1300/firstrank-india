@@ -13,6 +13,10 @@ const resultSchema = new mongoose.Schema(
 				selectedOption: String,
 			},
 		],
+		correctCount: {
+			type: Number,
+			default: 0,
+		},
 		score: {
 			type: Number,
 			default: 0,
@@ -20,6 +24,14 @@ const resultSchema = new mongoose.Schema(
 		total: {
 			type: Number,
 			default: 0,
+		},
+		timeTaken: {
+			type: Number,
+			default: 0,
+		},
+		sectionScores: {
+			type: Object,
+			default: {},
 		},
 		categoryScore: {
 			type: Object,

@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Day15 Result + Ranking API Tests",
+    "description": "Test result fetching and city/state/national ranking APIs with response validation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Result - Get User Result",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/result/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "result",
+            "{{userId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 404', function () {",
+              "  pm.expect([200, 404]).to.include(pm.response.code);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "pm.test('Response has success flag', function () {",
+              "  pm.expect(jsonData).to.have.property('success');",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "  pm.test('Result payload exists', function () {",
+              "    pm.expect(jsonData.data).to.be.an('object');",
+              "  });",
+              "  pm.test('Result has score and sectionScores', function () {",
+              "    pm.expect(jsonData.data).to.have.property('score');",
+              "    pm.expect(jsonData.data).to.have.property('sectionScores');",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - National",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/national?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "national"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "pm.test('National ranking response is clean', function () {",
+              "  pm.expect(jsonData.success).to.eql(true);",
+              "  pm.expect(jsonData.data).to.have.property('data');",
+              "  pm.expect(jsonData.data.data).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/city/{{city}}?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "city",
+            "{{city}}"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "pm.test('City ranking response is clean', function () {",
+              "  pm.expect(jsonData.success).to.eql(true);",
+              "  pm.expect(jsonData.data.filters.city).to.exist;",
+              "  pm.expect(jsonData.data.data).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - State",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/state/{{state}}?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "state",
+            "{{state}}"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "pm.test('State ranking response is clean', function () {",
+              "  pm.expect(jsonData.success).to.eql(true);",
+              "  pm.expect(jsonData.data.filters.state).to.exist;",
+              "  pm.expect(jsonData.data.data).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - User Position",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/user/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "user",
+            "{{userId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 404', function () {",
+              "  pm.expect([200, 404]).to.include(pm.response.code);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "pm.test('Ranking response has success flag', function () {",
+              "  pm.expect(jsonData).to.have.property('success');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "city",
+      "value": "Delhi"
+    },
+    {
+      "key": "state",
+      "value": "Maharashtra"
+    }
+  ]
+}
