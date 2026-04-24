@@ -207,10 +207,12 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Button size="sm" onClick={handleStartTest} className="flex items-center gap-2">
-                <BookOpen size={16} />
-                Get Started
-              </Button>
+              <Link to="/register">
+                <Button size="sm" className="flex items-center gap-2">
+                  <BookOpen size={16} />
+                  Get Started
+                </Button>
+              </Link>
 
               <Link to="/login">
                 <Button variant="secondary" size="sm">
@@ -332,20 +334,22 @@ export default function Navbar() {
                     Logout
                   </Button>
                 </div>
-                </>
-              ) : (
-                <>
-                  <Button fullWidth onClick={handleStartTest} className="flex items-center justify-center gap-2">
+              </>
+            ) : (
+              <>
+                <Link to="/register">
+                  <Button fullWidth className="flex items-center justify-center gap-2">
                     <BookOpen size={16} />
                     Get Started
                   </Button>
+                </Link>
 
-                  <Link to="/login">
-                    <Button variant="secondary" fullWidth>
-                      Login
-                    </Button>
-                  </Link>
-                </>
+                <Link to="/login">
+                  <Button variant="secondary" fullWidth>
+                    Login
+                  </Button>
+                </Link>
+              </>
             )}
 
             <div className="pt-3">

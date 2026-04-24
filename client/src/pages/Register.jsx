@@ -198,7 +198,7 @@ if (res.success) {
     {errors.password}
   </p>
 )}
-            <select
+            {/* <select
               name="category"
               value={formData.category}
               onChange={handleChange}
@@ -208,7 +208,7 @@ if (res.success) {
               <option value="business">Business Minded</option>
               <option value="job">Job Minded</option>
               <option value="institution">Institution</option>
-            </select>
+            </select> */}
 
             <Button fullWidth size="lg" disabled={loading}>
               {loading ? "Creating..." : "Create Free Account"}
