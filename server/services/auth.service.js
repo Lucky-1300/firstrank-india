@@ -34,6 +34,8 @@ const register = async (userData) => {
       mobile: user.mobile,
       city: user.city,
       state: user.state,
+      isPremium: user.isPremium,
+      premiumExpiresAt: user.premiumExpiresAt,
     },
   };
 };
@@ -59,6 +61,10 @@ const login = async (email, password) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      city: user.city,
+      state: user.state,
+      isPremium: user.isPremium,
+      premiumExpiresAt: user.premiumExpiresAt,
     },
   };
 };

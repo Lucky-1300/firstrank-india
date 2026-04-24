@@ -1,0 +1,509 @@
+{
+  "info": {
+    "name": "Day19 - All Endpoints API Tests",
+    "description": "End-to-end tests for auth, exam, result, and ranking endpoints with standard JSON response checks.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Day19 User\",\n  \"email\": \"day19.user@example.com\",\n  \"password\": \"Test@1234\",\n  \"mobile\": \"9999999999\",\n  \"city\": \"Delhi\",\n  \"state\": \"Delhi\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201 or 400', function () {",
+              "  pm.expect([201, 400]).to.include(pm.response.code);",
+              "});",
+              "const jsonData = pm.response.json();",
+              "pm.test('Standard JSON keys exist', function () {",
+              "  pm.expect(jsonData).to.have.property('success');",
+              "  pm.expect(jsonData).to.have.property('message');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"day19.user@example.com\",\n  \"password\": \"Test@1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const jsonData = pm.response.json();",
+              "pm.test('Token and userId exist', function () {",
+              "  pm.expect(jsonData.token).to.be.a('string').and.not.empty;",
+              "  pm.expect(jsonData.data.id).to.be.a('string');",
+              "});",
+              "pm.collectionVariables.set('token', jsonData.token);",
+              "pm.collectionVariables.set('userId', jsonData.data.id);",
+              "pm.collectionVariables.set('city', jsonData.data.city || 'Delhi');",
+              "pm.collectionVariables.set('state', jsonData.data.state || 'Delhi');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/profile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);",
+              "pm.expect(jsonData).to.have.property('data');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam - Questions",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/exam/questions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "exam",
+            "questions"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);",
+              "pm.expect(jsonData.data).to.be.an('array');",
+              "if (jsonData.data.length > 0) {",
+              "  const q = jsonData.data[0];",
+              "  pm.collectionVariables.set('questionId', q._id);",
+              "  pm.collectionVariables.set('selectedOption', q.options && q.options.length ? q.options[0] : '');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam - Submit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": \"{{questionId}}\",\n      \"selectedOption\": \"{{selectedOption}}\"\n    }\n  ],\n  \"timeTaken\": 120\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/exam/submit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "exam",
+            "submit"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);",
+              "pm.expect(jsonData.data).to.be.an('object');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Result - User Report",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/result/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "result",
+            "{{userId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function(){ pm.response.to.have.status(200); });",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);",
+              "pm.expect(jsonData.data).to.have.property('report');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Result - Premium Report",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/result/{{userId}}/premium",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "result",
+            "{{userId}}",
+            "premium"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 402', function(){ pm.expect([200,402]).to.include(pm.response.code); });",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData).to.have.property('success');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - National",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/national?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "national"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);",
+              "pm.expect(jsonData.data.data).to.be.an('array');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/city/{{city}}?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "city",
+            "{{city}}"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - State",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/state/{{state}}?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "state",
+            "{{state}}"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(200);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking - User",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ranking/user/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ranking",
+            "user",
+            "{{userId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 404', function(){ pm.expect([200,404]).to.include(pm.response.code); });",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData).to.have.property('success');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health - Not Found Handling",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/unknown-endpoint",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "unknown-endpoint"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.response.to.have.status(404);",
+              "const jsonData = pm.response.json();",
+              "pm.expect(jsonData.success).to.eql(false);",
+              "pm.expect(jsonData.error.code).to.eql('NOT_FOUND');"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "questionId",
+      "value": ""
+    },
+    {
+      "key": "selectedOption",
+      "value": ""
+    },
+    {
+      "key": "city",
+      "value": "Delhi"
+    },
+    {
+      "key": "state",
+      "value": "Delhi"
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 import Result from "../models/result.model.js";
+import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 const getComparableTime = (result) => {
 	if (typeof result?.timeTaken === "number" && result.timeTaken > 0) {
@@ -9,6 +11,11 @@ const getComparableTime = (result) => {
 };
 
 const cleanText = (value) => String(value || "").trim();
+const FALLBACK_RANKING_TIME = Number.MAX_SAFE_INTEGER;
+const normalizeRankingTime = (value) =>
+	typeof value === "number" && Number.isFinite(value) && value > 0
+		? value
+		: FALLBACK_RANKING_TIME;
 
 const getLeaderboardPipeline = ({ city, state } = {}) => {
 	const pipeline = [
@@ -57,6 +64,13 @@ const getLeaderboardPipeline = ({ city, state } = {}) => {
 
 	pipeline.push(
 		{
+			$addFields: {
+				rankingTime: {
+					$cond: [{ $gt: ["$timeTaken", 0] }, "$timeTaken", FALLBACK_RANKING_TIME],
+				},
+			},
+		},
+		{
 			$group: {
 				_id: "$userId",
 				result: { $first: "$$ROOT" },
@@ -68,7 +82,7 @@ const getLeaderboardPipeline = ({ city, state } = {}) => {
 		{
 			$sort: {
 				score: -1,
-				timeTaken: 1,
+				rankingTime: 1,
 				createdAt: 1,
 			},
 		}
@@ -100,6 +114,7 @@ const formatResult = (result) => {
 		total: plainResult.total ?? plainResult.answers?.length ?? 0,
 		timeTaken: plainResult.timeTaken ?? 0,
 		sectionScores: plainResult.sectionScores || plainResult.categoryScore || {},
+		rankingTime: normalizeRankingTime(plainResult.timeTaken),
 		user: user
 			? {
 				id: user._id || null,
@@ -111,6 +126,76 @@ const formatResult = (result) => {
 			: null,
 		createdAt: plainResult.createdAt,
 		updatedAt: plainResult.updatedAt,
+	};
+};
+
+const isPremiumUser = (user) => {
+	if (!user?.isPremium) {
+		return false;
+	}
+
+	if (!user.premiumExpiresAt) {
+		return true;
+	}
+
+	return new Date(user.premiumExpiresAt) > new Date();
+};
+
+const buildLimitedReport = (result) => {
+	const safeSectionScores = result.sectionScores || {};
+
+	return {
+		reportType: "limited",
+		score: result.score,
+		total: result.total,
+		timeTaken: result.timeTaken,
+		sections: Object.keys(safeSectionScores),
+		lockedFields: ["answers", "sectionScores"],
+	};
+};
+
+const buildFullReport = (result) => ({
+	reportType: "full",
+	...result,
+});
+
+const getUserResultReport = async (userId, options = {}) => {
+	const { requirePremium = false } = options;
+
+	if (!userId) {
+		throw new Error("User ID is required");
+	}
+
+	const [resultDoc, userDoc] = await Promise.all([
+		Result.findOne({ userId }).sort({ createdAt: -1 }),
+		User.findById(userId).select("name email city state isPremium premiumExpiresAt"),
+	]);
+
+	if (!resultDoc) {
+		throw new Error("Result not found");
+	}
+
+	if (!userDoc) {
+		throw new Error("User not found");
+	}
+
+	const formattedResult = formatResult({
+		...resultDoc.toObject(),
+		userId: userDoc,
+	});
+
+	const premiumActive = isPremiumUser(userDoc);
+
+	if (requirePremium && !premiumActive) {
+		throw new Error("Premium subscription required");
+	}
+
+	return {
+		isPremium: premiumActive,
+		plan: premiumActive ? "premium" : "free",
+		report: premiumActive
+			? buildFullReport(formattedResult)
+			: buildLimitedReport(formattedResult),
 	};
 };
 
@@ -129,7 +214,9 @@ const getUserResult = async (userId) => {
 };
 
 const getLeaderboard = async ({ limit = 10, city = null, state = null } = {}) => {
-	const results = await Result.aggregate(getLeaderboardPipeline({ city, state })).limit(limit);
+	const results = await Result.aggregate(getLeaderboardPipeline({ city, state }))
+		.limit(limit)
+		.allowDiskUse(true);
 
 	return results.map((result, index) => ({
 		rank: index + 1,
@@ -142,14 +229,68 @@ const getUserRanking = async (userId) => {
 		throw new Error("User ID is required");
 	}
 
-	const leaderboard = await getLeaderboard({ limit: 10000 });
-	const userRank = leaderboard.find((entry) => String(entry.userId?._id || entry.userId) === String(userId));
+	const latestUserResult = await Result.findOne({ userId })
+		.sort({ createdAt: -1 })
+		.select("_id userId score timeTaken createdAt sectionScores categoryScore correctCount total")
+		.lean();
 
-	if (!userRank) {
+	if (!latestUserResult) {
 		throw new Error("Ranking not found");
 	}
 
-	return userRank;
+	const normalizedTime = normalizeRankingTime(latestUserResult.timeTaken);
+
+	const [higherRankedCount, userWithProfile] = await Promise.all([
+		Result.aggregate([
+			{ $match: { userId: { $ne: null } } },
+			{ $sort: { createdAt: -1 } },
+			{ $group: { _id: "$userId", result: { $first: "$$ROOT" } } },
+			{ $replaceRoot: { newRoot: "$result" } },
+			{
+				$addFields: {
+					rankingTime: {
+						$cond: [{ $gt: ["$timeTaken", 0] }, "$timeTaken", FALLBACK_RANKING_TIME],
+					},
+				},
+			},
+			{
+				$match: {
+					$or: [
+						{ score: { $gt: latestUserResult.score || 0 } },
+						{ score: latestUserResult.score || 0, rankingTime: { $lt: normalizedTime } },
+						{
+							score: latestUserResult.score || 0,
+							rankingTime: normalizedTime,
+							createdAt: { $lt: latestUserResult.createdAt },
+						},
+					],
+				},
+			},
+			{ $count: "count" },
+		]),
+		Result.aggregate([
+			{ $match: { userId: new mongoose.Types.ObjectId(userId) } },
+			{ $sort: { createdAt: -1 } },
+			{ $limit: 1 },
+			{
+				$lookup: {
+					from: "users",
+					localField: "userId",
+					foreignField: "_id",
+					as: "user",
+				},
+			},
+			{ $unwind: "$user" },
+		]),
+	]);
+
+	const rank = (higherRankedCount?.[0]?.count || 0) + 1;
+	const profileResult = userWithProfile?.[0] || latestUserResult;
+
+	return {
+		rank,
+		...formatResult(profileResult),
+	};
 };
 
 const getRankingSummary = async ({ city = null, state = null, limit = 10 } = {}) => {
@@ -186,4 +327,5 @@ export {
 	getNationalRanking,
 	getCityRanking,
 	getStateRanking,
+	getUserResultReport,
 };
