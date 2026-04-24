@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 // ================= REGISTER =================
 const register = async (userData) => {
-  const { name, email, password, mobile } = userData;
+  const { name, email, password, mobile, city, state } = userData;
 
   // 1. Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -20,6 +20,8 @@ const register = async (userData) => {
     email,
     password: hashedPassword,
     mobile,
+    city: city || "",
+    state: state || "",
   });
 
   // 4. Return safe data (no password)
@@ -30,6 +32,8 @@ const register = async (userData) => {
       name: user.name,
       email: user.email,
       mobile: user.mobile,
+      city: user.city,
+      state: user.state,
     },
   };
 };
