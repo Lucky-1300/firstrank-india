@@ -5,8 +5,11 @@ import {
 	fetchStateRanking,
 	fetchUserRanking,
 } from "../controllers/ranking.controller.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 // GET /api/ranking/national
 router.get("/national", fetchNationalRanking);

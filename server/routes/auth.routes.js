@@ -11,7 +11,8 @@ router.get("/profile", authMiddleware, (req, res) => {
 	return res.status(200).json({
 		success: true,
 		message: "Protected route accessed",
-		user: req.user,
+		data: req.user,
+		error: null,
 	});
 });
 

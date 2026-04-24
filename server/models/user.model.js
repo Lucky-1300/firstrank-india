@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   mobile: String,
   city: { type: String, default: "" },
   state: { type: String, default: "" },
+  isPremium: { type: Boolean, default: false },
+  premiumExpiresAt: { type: Date, default: null },
 });
 
 const User = mongoose.model("User", userSchema);

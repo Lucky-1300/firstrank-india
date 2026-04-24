@@ -41,6 +41,9 @@ const resultSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+resultSchema.index({ userId: 1, createdAt: -1 });
+resultSchema.index({ score: -1, timeTaken: 1, createdAt: 1 });
+
 const Result = mongoose.model("Result", resultSchema);
 
 export default Result;

@@ -2,44 +2,46 @@ import Question from "../models/question.model.js";
 
 // GET QUESTIONS (Day 6/7)
 const fetchQuestions = async () => {
-  let questions = await Question.find();
-
-  // ✅ remove invalid questions (VERY IMPORTANT)
-  questions = questions.filter(
-    (q) => q.options && q.options.length > 0
-  );
-
-  // shuffle
-  questions = questions.sort(() => Math.random() - 0.5);
-
-  // limit
-  questions = questions.slice(0, 50);
-
-  // hide correct answers
-  const safeQuestions = questions.map((q) => ({
-    _id: q._id,
-    question: q.question,
-    options: q.options,
-    category: q.category,
-    difficulty: q.difficulty,
-  }));
+  const safeQuestions = await Question.aggregate([
+    {
+      $match: {
+        "options.0": { $exists: true },
+      },
+    },
+    {
+      $sample: { size: 50 },
+    },
+    {
+      $project: {
+        _id: 1,
+        question: 1,
+        options: 1,
+        category: 1,
+        difficulty: 1,
+      },
+    },
+  ]);
 
   return safeQuestions;
 };
 
 // EVALUATE EXAM (Day 8/9 🔥)
 const evaluateExam = async (answers) => {
+  const validAnswers = (answers || []).filter((answer) => answer?.questionId);
+
+  const questionIds = [...new Set(validAnswers.map((answer) => String(answer.questionId)))];
+  const questions = await Question.find({ _id: { $in: questionIds } })
+    .select("_id category correctAnswer")
+    .lean();
+
+  const questionMap = new Map(questions.map((question) => [String(question._id), question]));
+
   let correctCount = 0;
   let evaluatedCount = 0;
   const sectionScores = {};
 
-  for (const ans of answers) {
-    const questionId = ans?.questionId;
-    if (!questionId) {
-      continue;
-    }
-
-    const question = await Question.findById(questionId);
+  for (const ans of validAnswers) {
+    const question = questionMap.get(String(ans.questionId));
     if (!question) {
       continue;
     }

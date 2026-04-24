@@ -1,60 +1,52 @@
-import jwt from "jsonwebtoken";
 import { login, register } from "../services/auth.service.js";
+import { createAppError } from "../utils/appError.js";
+import { generateToken } from "../utils/jwt.utils.js";
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   try {
     const { name, email, password, mobile, city, state } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password required",
-      });
+      throw createAppError("Name, email and password required", 400, "BAD_REQUEST");
     }
 
     const result = await register({ name, email, password, mobile, city, state });
 
     return res.status(201).json({
       success: true,
-      ...result,
+      message: result.message,
+      data: result.data,
+      error: null,
     });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message || "Registration failed",
-    });
+    return next(error);
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password required",
-      });
+      throw createAppError("Email and password required", 400, "BAD_REQUEST");
     }
 
     const result = await login(email, password);
 
-    const token = jwt.sign(
+    const token = generateToken(
       { id: result.data.id, email: result.data.email },
-      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     return res.status(200).json({
       success: true,
+      message: result.message,
+      data: result.data,
       token,
-      ...result,
+      error: null,
     });
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: error.message || "Login failed",
-    });
+    return next(error);
   }
 };
 
