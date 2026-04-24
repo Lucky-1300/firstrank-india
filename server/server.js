@@ -46,9 +46,9 @@ app.get("/api/health", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/exam", examRoutes); // ✅ ADD THIS
 app.use("/api/result", resultRoutes);
 app.use("/api/ranking", rankingRoutes);
+app.use("/api/exam", examRoutes); 
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

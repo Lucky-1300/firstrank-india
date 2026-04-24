@@ -42,7 +42,10 @@ const submitExam = async (req, res) => {
     }
 
     const invalidAnswer = answers.find(
-      (answer) => !answer || !answer.questionId || typeof answer.selectedOption !== "string"
+      (answer) =>
+        !answer ||
+        !answer.questionId ||
+        typeof answer.selectedOption !== "string",
     );
 
     if (invalidAnswer) {
@@ -58,26 +61,38 @@ const submitExam = async (req, res) => {
 
     const result = await evaluateExam(answers);
     const parsedTimeTaken = Number(timeTaken);
-    const safeTimeTaken = Number.isFinite(parsedTimeTaken) && parsedTimeTaken >= 0 ? parsedTimeTaken : 0;
+    const safeTimeTaken =
+      Number.isFinite(parsedTimeTaken) && parsedTimeTaken >= 0
+        ? parsedTimeTaken
+        : 0;
 
     await Result.create({
-      userId: req.user?.id || null,
+      userId: req.user?.id,
       answers,
-      correctCount: result.correctCount,
+      correctCount: result.score,
       score: result.score,
       total: result.total,
       timeTaken: safeTimeTaken,
-      sectionScores: result.sectionScores,
+      sectionScores: result.categoryScore,
       categoryScore: result.categoryScore,
     });
 
     return res.status(200).json({
       success: true,
       message: "Exam evaluated successfully",
-      data: result,
+      data: {
+        summary: {
+          score: result.score,
+          percentage: result.percentage,
+          total: result.total,
+          correct: result.correctCount,
+          timeTaken: safeTimeTaken,
+        },
+        sections: result.sectionScores,
+        categories: result.categoryScore,
+      },
       error: null,
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,

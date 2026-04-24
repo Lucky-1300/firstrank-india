@@ -29,12 +29,16 @@ const fetchQuestions = async () => {
 const evaluateExam = async (answers) => {
   const validAnswers = (answers || []).filter((answer) => answer?.questionId);
 
-  const questionIds = [...new Set(validAnswers.map((answer) => String(answer.questionId)))];
+  const questionIds = [
+    ...new Set(validAnswers.map((answer) => String(answer.questionId))),
+  ];
   const questions = await Question.find({ _id: { $in: questionIds } })
     .select("_id category correctAnswer")
     .lean();
 
-  const questionMap = new Map(questions.map((question) => [String(question._id), question]));
+  const questionMap = new Map(
+    questions.map((question) => [String(question._id), question]),
+  );
 
   let correctCount = 0;
   let evaluatedCount = 0;
@@ -84,12 +88,18 @@ const evaluateExam = async (answers) => {
   }
 
   return {
-    score: evaluatedCount ? Math.round((correctCount / evaluatedCount) * 100) : 0,
+    score: correctCount,
+    percentage: evaluatedCount
+      ? Math.round((correctCount / evaluatedCount) * 100)
+      : 0,
     correctCount,
     total: evaluatedCount,
     sectionScores,
     categoryScore: Object.fromEntries(
-      Object.entries(sectionScores).map(([section, value]) => [section, value.correct])
+      Object.entries(sectionScores).map(([section, value]) => [
+        section,
+        value.correct,
+      ]),
     ),
   };
 };
