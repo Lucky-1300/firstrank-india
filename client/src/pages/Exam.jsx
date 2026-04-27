@@ -20,7 +20,8 @@ export default function Exam() {
   const [hasStarted, setHasStarted] = useState(false);
   const [deadline, setDeadline] = useState(null);
   const [timeLeft, setTimeLeft] = useState(1800);
-  const totalQuestions = 45;
+  // const totalQuestions = 45;
+  const totalQuestions = questions.length;
 
 
 // FETCH QUESTIONS
@@ -28,11 +29,14 @@ useEffect(() => {
   fetch("http://localhost:3000/api/exam/questions")
     .then((res) => res.json())
     .then((data) => {
-      setQuestions(data.data);
+      setQuestions(data?.data);
     })
     .catch((err) => console.log(err));
 }, []);
 
+useEffect(() => {
+  console.log(questions);
+}, [questions]);
 
 
 
@@ -115,57 +119,67 @@ useEffect(() => {
   };
 
 
-
-  const correctAnswers = [0,3,1,1,2,2,0,2,2,1,1,1,1,1,2,2,1,0,1,0,1,1,1,3,1,1,1,1,1];
   const calculateScore = () => {
-    if (!questions.length) return 0;
+  if (!questions.length) return 0;
 
-    let score = 0;
-    questions.forEach((q, i) => {
-      // if (answers[i] === q.answer) score++;
-      // if (answers[i] === correctAnswers[i]) score++;
-      if (Number(answers[i]) === correctAnswers[i]) score++;
-    });
-    return Math.round((score / questions.length) * 100);
-  };
+  let score = 0;
+
+  questions.forEach((q, i) => {
+    if (
+      answers[i] !== undefined &&
+      q.correctAnswer === q.options[answers[i]]
+    ) {
+      score++;
+    }
+  });
+
+  return Math.round((score / questions.length) * 100);
+};
+
+
+
+
 
   const submitExam = () => {
-    const score = calculateScore();
+  const score = calculateScore();
 
-    const payload = {
-      answers: questions.map((question, i) => ({
-        questionId: question._id,
-        selectedOption:
-          answers[i] !== undefined ? question.options[answers[i]] : "",
-      })),
-      score,
-      timeTaken: 1800 - timeLeft,
-    };
-
-    fetch("http://localhost:3000/api/exam/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Submit response:", data);
-      })
-      .catch((err) => console.log(err));
-
-
-    localStorage.removeItem(STORAGE_KEY);
-
-    navigate("/result", {
-      state: {
-        score,
-        answers,
-        questions,
-      },
-    });
+  const payload = {
+    answers: questions.map((question, i) => ({
+      questionId: question._id,
+      selectedOption:
+        answers[i] !== undefined ? question.options[answers[i]] : "",
+    })),
+    score,
+    timeTaken: 1800 - timeLeft,
   };
+
+  // ✅ TOKEN YAHAN SE AAYEGA
+  const token = localStorage.getItem("authToken");
+
+  fetch("http://localhost:3000/api/exam/submit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:` Bearer ${token}`, // ✅ ye sabse important hai
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Submit response:", data);
+
+      localStorage.removeItem("examState");
+
+      navigate("/result", {
+        state: {
+          score,
+          answers,
+          questions,
+        },
+      });
+    })
+    .catch((err) => console.log(err));
+};
 
   if (!hasStarted) {
     return (
