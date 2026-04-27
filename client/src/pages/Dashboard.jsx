@@ -7,7 +7,12 @@ import { Zap, Lock, Sparkles } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+  name: "Loading...",
+  email: "",
+  category: "",
+});
 
   const getSafeStoredUser = () => {
     try {
@@ -73,23 +78,13 @@ export default function Dashboard() {
 }, [navigate]);
 
 
-  if (!user) {
-    return (
-      <main className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center px-4 transition-colors duration-300">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-gray-500 dark:text-slate-400">Loading dashboard...</p>
-        </div>
-      </main>
-    );
-  }
+const stats = [
+  { label: "Your Rank", value:` #${user?.rank || 42}` },
+  { label: "Tests Completed", value: user?.totalTests || 12 },
+  { label: "Average Score", value:` ${user?.averageScore || 88}% `},
+  { label: "Skills Gained", value: user?.skills?.length || 6 },
+];
 
-  const stats = [
-    { label: "Your Rank", value: `#${user.rank || 42}` },
-    { label: "Tests Completed", value: user.totalTests || 12 },
-    { label: "Average Score", value: `${user.averageScore || 88}%` },
-    { label: "Skills Gained", value: user.skills?.length || 6 },
-  ];
 
   const progress = [
     ["Problem Solving", 82],
@@ -110,7 +105,7 @@ export default function Dashboard() {
             </p>
 
             <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white leading-tight transition-colors duration-300">
-              Welcome back, {user.name} 👋
+              Welcome back, {user?.name} 👋
             </h1>
 
             <p className="mt-3 text-sm sm:text-base text-gray-500 dark:text-slate-400 transition-colors duration-300">
@@ -205,15 +200,16 @@ export default function Dashboard() {
 
             <div className="mt-6 flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl font-black">
-                {user.name?.charAt(0)?.toUpperCase()}
+                {/* {user.name?.charAt(0)?.toUpperCase()} */}
+                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
 
               <div>
                 <p className="font-bold text-gray-900 dark:text-white transition-colors duration-300">
-                  {user.name}
+                  {user?.name}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-slate-400 transition-colors duration-300">
-                  {user.category}
+                  {user?.category}
                 </p>
               </div>
             </div>
@@ -222,14 +218,14 @@ export default function Dashboard() {
               <div>
                 <p className="text-gray-500 dark:text-slate-400 transition-colors duration-300">Email</p>
                 <p className="font-medium break-all text-gray-900 dark:text-slate-100 transition-colors duration-300">
-                  {user.email}
+                  {user?.email}
                 </p>
               </div>
 
               <div>
                 <p className="text-gray-500 dark:text-slate-400 transition-colors duration-300">Category</p>
                 <p className="font-medium capitalize text-gray-900 dark:text-slate-100 transition-colors duration-300">
-                  {user.category}
+                  {user?.category}
                 </p>
               </div>
 
