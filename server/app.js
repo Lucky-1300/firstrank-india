@@ -1,9 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const authRoutes = require("./routes/auth.routes");
-const examRoutes = require("./routes/exam.routes"); // ✅ ADD THIS
+import express from "express";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.routes.js";
+import examRoutes from "./routes/exam.routes.js";
+import resultRoutes from "./routes/result.routes.js";
 
 const app = express();
+
 
 app.use(cors());
 app.use(express.json());
@@ -38,10 +41,9 @@ app.post("/login", (req, res) => {
   });
 });
 
-// auth routes
+// routes
 app.use("/api/auth", authRoutes);
-
-// ✅ exam routes (IMPORTANT)
 app.use("/api/exam", examRoutes);
+app.use("/api/result", resultRoutes); // ✅ FIX HERE
 
 module.exports = app;
