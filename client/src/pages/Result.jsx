@@ -16,52 +16,77 @@ import {
 
 export default function Result() {
   const location = useLocation();
-  const score = location.state?.score || 78;
+
+  const result = location.state || {};
+const summary = result?.summary
+if (!result?.summary) {
+  return <h1 className="text-center mt-10 text-xl">No Result Found</h1>;
+}
   const studentName = location.state?.studentName || "Utkarsh";
 
-  const skills = [
-    ["Logic", 85],
-    ["Decision Making", 92],
-    ["Finance", 74],
-    ["Leadership", 88],
-  ];
+  
+const scorePercent = Math.round(
+  (summary?.score / summary?.total) * 100
+);
 
-  const stats = [
-    { label: "City Rank", value: "#2", icon: MapPin },
-    { label: "State Rank", value: "#9", icon: Trophy },
-    { label: "National Rank", value: "#18", icon: Award },
-    { label: "Percentile", value: "95%", icon: TrendingUp },
-  ];
+const skills = [
+  ["Logic", scorePercent],
+  ["Decision Making", scorePercent],
+  ["Finance", scorePercent],
+  ["Leadership", scorePercent],
+];
 
-  const careers = [
-    "Data Analyst",
-    "Consultant",
-    "Product Manager",
-    "Business Strategist",
-  ];
+  
+const stats = [
+  { label: "City Rank", value: result?.rank?.city || "#--", icon: MapPin },
+  { label: "State Rank", value: result?.rank?.state || "#--", icon: Trophy },
+  { label: "National Rank", value: result?.rank?.national || "#--", icon: Award },
+  { label: "Percentile", value: result?.summary?.percentile || "--%", icon: TrendingUp },
+];
 
-  const reportCards = [
-    {
-      icon: Brain,
-      title: "Personality Insight",
-      text: "You think clearly under pressure and perform well in structured challenges.",
-    },
-    {
-      icon: Users,
-      title: "Team Strength",
-      text: "You communicate effectively and can influence group decisions positively.",
-    },
-    {
-      icon: Target,
-      title: "Growth Area",
-      text: "Your financial reasoning can improve further with regular practice.",
-    },
-    {
-      icon: BarChart3,
-      title: "Overall Trend",
-      text: "Your score shows strong potential for leadership and analytical roles.",
-    },
-  ];
+
+const careers = result?.careers || [
+  "Data Analyst",
+  "Consultant",
+  "Product Manager",
+  "Business Strategist",
+];
+
+const reportCards = [
+  {
+    icon: Brain,
+    title: "Personality Insight",
+    text:
+      summary?.score > 80
+        ? "You perform excellently under pressure."
+        : "You have good potential but need consistency.",
+  },
+  {
+    icon: Users,
+    title: "Team Strength",
+    text:
+      result?.sections?.leadership > 80
+        ? "Strong leadership and teamwork skills."
+        : "You can improve collaboration skills.",
+  },
+  {
+    icon: Target,
+    title: "Growth Area",
+    text:
+      result?.sections?.finance < 70
+        ? "Focus more on financial reasoning."
+        : "Your financial skills are solid.",
+  },
+  {
+    icon: BarChart3,
+    title: "Overall Trend",
+    text:
+      summary?.score > 75
+        ? "You are on a strong growth path."
+        : "You need more practice to improve.",
+  },
+];
+
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 sm:py-10 lg:py-14 transition-colors duration-300">
@@ -91,7 +116,7 @@ export default function Result() {
             </p>
 
             <h2 className="relative mt-6 text-7xl sm:text-8xl font-black">
-              {score}/100
+              {summary?.score}/{summary?.total}
             </h2>
 
             <div className="relative mt-6 space-y-3">
