@@ -97,12 +97,12 @@ export default function Navbar() {
 
 
   return (
-    <nav className="sticky top-0 px-5 z-50 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
-      <div className="w-full px-2 sm:px-4 lg:px-0 h-18 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-18 flex items-center justify-between">
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 shrink-0 hover:opacity-90 transition">
-          <img src="/logo.png" alt="First Rank India" className="h-15 md:h-16 lg:h-17 w-auto" />
+          <img src="/logo.png" alt="First Rank India" className="h-12 md:h-14 lg:h-16 w-auto" />
 
           <div className="leading-none">
             <p className="font-black text-xs sm:text-sm text-orange-600 tracking-wide">India's First</p>
