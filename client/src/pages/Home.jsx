@@ -17,6 +17,9 @@ import {
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Carousel from "../components/Carousel";
+import slide1 from "../assets/slide 1.png";
+import slide2 from "../assets/slide 2.png";
+import slide3 from "../assets/slide 3.png";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -32,6 +35,7 @@ export default function Home() {
   const heroSlides = useMemo(
     () => [
       {
+        image: slide1,
         badge: "India's #1 Skill-Based Platform",
         title1: "Discover Your",
         highlight: "True Potential",
@@ -40,6 +44,7 @@ export default function Home() {
           "AI-powered skill assessments that measure creativity, logic, leadership and real-world intelligence.",
       },
       {
+        image: slide2,
         badge: "Trusted by 50,000+ Students",
         title1: "Rank Nationally",
         highlight: "Grow Faster",
@@ -48,6 +53,7 @@ export default function Home() {
           "Compete with students across India and unlock deep insights to improve every week.",
       },
       {
+        image: slide3,
         badge: "Career Guidance Engine",
         title1: "Choose Careers",
         highlight: "With Confidence",
@@ -126,7 +132,7 @@ export default function Home() {
             items={heroSlides.map((slide, i) => (
               <div
                 key={i}
-                className="grid lg:grid-cols-2 gap-14 items-center min-h-[700px]"
+                className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center min-h-[560px] md:min-h-[640px] lg:min-h-[700px]"
               >
                 {/* Left */}
                 <motion.div
@@ -188,33 +194,31 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.92 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8 }}
-                  className="relative"
+                  className="relative w-full mb-2 lg:mb-0"
                 >
-                  <div className="relative h-[560px] overflow-hidden transition-colors duration-300">
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-orange-50/70 via-white/30 to-orange-100/50 blur-3xl dark:from-slate-800/30 dark:via-slate-900/10 dark:to-slate-950/20" />
-
+                  <div className="relative w-full h-[220px] sm:h-[300px] md:h-[420px] lg:h-[560px] overflow-hidden rounded-3xl lg:rounded-4xl transition-colors duration-300 shadow-2xl">
                     <img
-                      src="/hero.png"
-                      alt="hero"
-                      className="relative z-10 w-full h-full object-contain opacity-95"
+                      src={slide.image}
+                      alt={slide.title1}
+                      className="w-full h-full object-contain bg-white/40 dark:bg-slate-900/40"
                     />
 
                     <motion.div
                       animate={{ y: [0, -10, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute top-10 left-0 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-5 py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                      className="absolute top-3 sm:top-6 left-2 sm:left-3 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
                     >
-                      <p className="text-gray-500 dark:text-slate-400 text-sm">Your Rank</p>
-                      <p className="font-bold text-xl text-gray-900 dark:text-white">#12 National</p>
+                      <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Your Rank</p>
+                      <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">#12 National</p>
                     </motion.div>
 
                     <motion.div
                       animate={{ y: [0, 12, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute bottom-12 right-0 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-5 py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                      className="absolute bottom-3 sm:bottom-8 right-2 sm:right-3 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
                     >
-                      <p className="text-gray-500 dark:text-slate-400 text-sm">Skill Score</p>
-                      <p className="font-bold text-xl text-gray-900 dark:text-white">87 / 100</p>
+                      <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Skill Score</p>
+                      <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">87 / 100</p>
                     </motion.div>
                   </div>
                 </motion.div>

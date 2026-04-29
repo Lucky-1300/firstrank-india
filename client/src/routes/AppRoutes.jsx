@@ -10,6 +10,7 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Exam from '../pages/Exam';
 import Result from '../pages/Result';
+import Reports from '../pages/Reports';
 import Leaderboard from '../pages/Leaderboard';
 import AdminDashboard from '../pages/AdminDashboard';
 import MyProfile from '../pages/MyProfile';
@@ -64,6 +65,15 @@ export default function AppRoutes() {
   element={
     <ProtectedRoute>
       <Result />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/reports"
+  element={
+    <ProtectedRoute>
+      <Reports />
     </ProtectedRoute>
   }
 />

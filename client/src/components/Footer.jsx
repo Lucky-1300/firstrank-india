@@ -37,16 +37,12 @@ export default function Footer() {
               <img
                 src="/logo.png"
                 alt="First Rank India"
-                className="h-10 w-auto"
+                className="h-15 md:h-16 lg:h-17 w-auto"
               />
 
               <div className="leading-none">
-                <p className="font-black text-sm text-orange-400">
-                  FIRST RANK
-                </p>
-                <p className="font-black text-xs text-orange-400">
-                  INDIA
-                </p>
+                <p className="font-black text-lg lg:text-xl md:text-lg text-orange-600 tracking-wide">India's First</p>
+                <p className="font-black text-xs lg:text-sm md:text-xs text-orange-600 tracking-wide">Smart Education Platform</p>
               </div>
             </Link>
 
