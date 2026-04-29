@@ -12,6 +12,8 @@ export default function Exam() {
   
   const [questions, setQuestions] = useState([]);
 
+  const [result, setResult] = useState(null);
+
 
 
 
@@ -20,6 +22,7 @@ export default function Exam() {
   const [hasStarted, setHasStarted] = useState(false);
   const [deadline, setDeadline] = useState(null);
   const [timeLeft, setTimeLeft] = useState(1800);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   // const totalQuestions = 45;
   const totalQuestions = questions.length;
 
@@ -136,31 +139,36 @@ useEffect(() => {
   return Math.round((score / questions.length) * 100);
 };
 
-
-
-
-
-  const submitExam = () => {
+const submitExam = () => {
+  if (isSubmitted) return;
+setIsSubmitted(true)
   const score = calculateScore();
 
   const payload = {
-    answers: questions.map((question, i) => ({
-      questionId: question._id,
-      selectedOption:
-        answers[i] !== undefined ? question.options[answers[i]] : "",
-    })),
+    answers: questions
+      .map((question, i) => {
+        if (answers[i] === undefined) return null;
+
+        return {
+          questionId: question._id,
+          selectedOption: question.options[answers[i]],
+        };
+      })
+      .filter(Boolean),
     score,
     timeTaken: 1800 - timeLeft,
   };
 
-  // ✅ TOKEN YAHAN SE AAYEGA
   const token = localStorage.getItem("authToken");
+
+  console.log("TOKEN:", token);
+  console.log("PAYLOAD:", payload);
 
   fetch("http://localhost:3000/api/exam/submit", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization:` Bearer ${token}`, // ✅ ye sabse important hai
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
   })
@@ -168,18 +176,37 @@ useEffect(() => {
     .then((data) => {
       console.log("Submit response:", data);
 
-      localStorage.removeItem("examState");
+      if (!data.success) return;
 
-      navigate("/result", {
-        state: {
-          score,
-          answers,
-          questions,
-        },
-      });
+      // ✅ TOKEN se userId nikaal rahe
+      const tokenData = JSON.parse(atob(token.split(".")[1]));
+      // const userId = tokenData.id;
+      const userId = localStorage.getItem("userId");
+
+      setTimeout(() => {
+        fetch(`http://localhost:3000/api/result/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((resultData) => {
+            console.log("Result API:", resultData);
+
+            if (!resultData.success) return;
+
+            setResult(resultData.data);
+
+            localStorage.removeItem("examState");
+
+            navigate("/result", {
+              state: resultData.data.report,
+            });
+          });
+      }, 1500);
     })
     .catch((err) => console.log(err));
-};
+  };
 
   if (!hasStarted) {
     return (
