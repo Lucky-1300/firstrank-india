@@ -47,7 +47,7 @@ export default function Carousel({
           {/* Left */}
           <button
             onClick={prev}
-            className="absolute left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
+            className="absolute top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
           >
             <ChevronLeft size={22} />
           </button>

@@ -98,7 +98,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-18 flex items-center justify-between">
+      <div className="w-full px-3 sm:px-4 lg:px-6 h-18 flex items-center justify-between">
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 shrink-0 hover:opacity-90 transition">
