@@ -265,104 +265,19 @@ export default function Navbar() {
           open ? "max-h-screen border-t border-gray-100" : "max-h-0"
         }`}
       >
-        <div className="px-5 py-5 bg-white dark:bg-slate-950 flex flex-col gap-1 transition-colors duration-300">
-          {navLinks.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`px-3 py-3 rounded-xl text-sm transition-colors duration-300 ${activeClass(
-                item.path
-              )} hover:bg-orange-50 dark:hover:bg-white/10`}
-            >
-              {item.name}
-            </Link>
-          ))}
-
-          <div className="space-y-2 pt-4 border-t border-gray-100 dark:border-slate-800 mt-4">
-            {token ? (
-              <>
-                <Link to="/">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    Home
-                  </Button>
-                </Link>
-
-                <Link to="/dashboard">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    <LayoutDashboard size={16} />
-                    Dashboard
-                  </Button>
-                </Link>
-
-                <Link to="/exam">
-                  <Button fullWidth className="flex items-center justify-center gap-2">
-                    <BookOpen size={16} />
-                    Exam
-                  </Button>
-                </Link>
-
-                <Link to="/result">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    <FileText size={16} />
-                    Results
-                  </Button>
-                </Link>
-
-                <Link to="/reports">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    <ClipboardList size={16} />
-                    Reports
-                  </Button>
-                </Link>
-
-                <Link to="/profile">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    <UserCircle2 size={16} />
-                    My Profile
-                  </Button>
-                </Link>
-
-                <Link to="/settings">
-                  <Button variant="secondary" fullWidth className="flex items-center justify-center gap-2">
-                    <Settings size={16} />
-                    Settings
-                  </Button>
-                </Link>
-
-                <div className="pt-2">
-                  <Button fullWidth onClick={handleLogout} variant="ghost">
-                    Logout
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Link to="/register">
-                  <Button fullWidth className="flex items-center justify-center gap-2">
-                    <BookOpen size={16} />
-                    Get Started
-                  </Button>
-                </Link>
-
-                <Link to="/login">
-                  <Button variant="secondary" fullWidth>
-                    Login
-                  </Button>
-                </Link>
-              </>
-            )}
-
-            <div className="pt-3">
-              <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 text-white p-4 shadow-lg">
-                <div className="flex items-start gap-3">
-                  <Sparkles size={18} className="mt-0.5" />
-                  <div>
-                    <p className="font-bold">Demo ready</p>
-                    <p className="text-sm text-white/90">Smooth animations, theme toggle and polished UI are enabled.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="px-5 py-5 bg-white dark:bg-slate-950 flex flex-col gap-2 transition-colors duration-300">
+          <div className="space-y-2">
+            {navLinks.map((item) => (
+              <Link key={item.path} to={item.path}>
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  className={`justify-center my-1 rounded-2xl ${activeClass(item.path)}`}
+                >
+                  {item.name}
+                </Button>
+              </Link>
+            ))}
           </div>
         </div>
       </div>

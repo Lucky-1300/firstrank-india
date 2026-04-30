@@ -24,80 +24,64 @@ const getStoredUser = () => {
 
 export default function Result() {
   const location = useLocation();
-  const score = location.state?.score || 78;
+  const score = location.state?.score || 0;
+  const correctCount = location.state?.correctCount || 0;
+  const totalQuestions = location.state?.totalQuestions || 29;
   const storedUser = getStoredUser();
   const studentName = location.state?.studentName || storedUser?.name || "Student";
   const studentEmail = location.state?.studentEmail || storedUser?.email || "";
 
-  const result = location.state || {};
-const summary = result?.summary
-if (!result?.summary) {
-  return <h1 className="text-center mt-10 text-xl">No Result Found</h1>;
-}
-  const studentName = location.state?.studentName || "Utkarsh";
+  const scorePercent = Math.round(score);
 
-  
-const scorePercent = Math.round(
-  (summary?.score / summary?.total) * 100
-);
+  const skills = [
+    ["Logic", scorePercent],
+    ["Decision Making", scorePercent],
+    ["Finance", scorePercent],
+    ["Leadership", scorePercent],
+  ];
 
-const skills = [
-  ["Logic", scorePercent],
-  ["Decision Making", scorePercent],
-  ["Finance", scorePercent],
-  ["Leadership", scorePercent],
-];
+  const stats = [
+    { label: "City Rank", value: "#2", icon: MapPin },
+    { label: "State Rank", value: "#9", icon: Trophy },
+    { label: "National Rank", value: "#18", icon: Award },
+    { label: "Percentile", value: "95%", icon: TrendingUp },
+  ];
 
-  
-const stats = [
-  { label: "City Rank", value: result?.rank?.city || "#--", icon: MapPin },
-  { label: "State Rank", value: result?.rank?.state || "#--", icon: Trophy },
-  { label: "National Rank", value: result?.rank?.national || "#--", icon: Award },
-  { label: "Percentile", value: result?.summary?.percentile || "--%", icon: TrendingUp },
-];
+  const careers = [
+    "Data Analyst",
+    "Consultant",
+    "Product Manager",
+    "Business Strategist",
+  ];
 
-
-const careers = result?.careers || [
-  "Data Analyst",
-  "Consultant",
-  "Product Manager",
-  "Business Strategist",
-];
-
-const reportCards = [
-  {
-    icon: Brain,
-    title: "Personality Insight",
-    text:
-      summary?.score > 80
-        ? "You perform excellently under pressure."
-        : "You have good potential but need consistency.",
-  },
-  {
-    icon: Users,
-    title: "Team Strength",
-    text:
-      result?.sections?.leadership > 80
-        ? "Strong leadership and teamwork skills."
-        : "You can improve collaboration skills.",
-  },
-  {
-    icon: Target,
-    title: "Growth Area",
-    text:
-      result?.sections?.finance < 70
-        ? "Focus more on financial reasoning."
-        : "Your financial skills are solid.",
-  },
-  {
-    icon: BarChart3,
-    title: "Overall Trend",
-    text:
-      summary?.score > 75
-        ? "You are on a strong growth path."
-        : "You need more practice to improve.",
-  },
-];
+  const reportCards = [
+    {
+      icon: Brain,
+      title: "Personality Insight",
+      text:
+        scorePercent > 80
+          ? "You perform excellently under pressure."
+          : "You have good potential but need consistency.",
+    },
+    {
+      icon: Users,
+      title: "Team Strength",
+      text: "You communicate effectively and can influence group decisions positively.",
+    },
+    {
+      icon: Target,
+      title: "Growth Area",
+      text: "Your financial reasoning can improve further with regular practice.",
+    },
+    {
+      icon: BarChart3,
+      title: "Overall Trend",
+      text:
+        scorePercent > 75
+          ? "You are on a strong growth path."
+          : "You need more practice to improve.",
+    },
+  ];
 
 
   return (
@@ -133,13 +117,21 @@ const reportCards = [
               Your Final Score
             </p>
 
-            <h2 className="relative mt-6 text-7xl sm:text-8xl font-black">
-              {summary?.score}/{summary?.total}
+            <h2 className="relative mt-6 text-6xl sm:text-7xl font-black">
+              {scorePercent}%
             </h2>
+
+            <p className="relative mt-2 text-base sm:text-lg opacity-90">
+              {correctCount} correct out of {totalQuestions} questions
+            </p>
 
             <div className="relative mt-6 space-y-3">
               <p className="text-base sm:text-lg opacity-95">
-                Strong performance across logic, decision making and leadership.
+                {scorePercent >= 80
+                  ? "Excellent! You performed very well."
+                  : scorePercent >= 60
+                    ? "Good performance! Keep practicing to improve."
+                    : "You have potential! Focus on weak areas."}
               </p>
 
               <div className="inline-block px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 font-semibold">
