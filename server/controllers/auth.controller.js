@@ -11,10 +11,16 @@ const registerUser = async (req, res, next) => {
     }
 
     const result = await register({ name, email, password, mobile, city, state });
+    const token = generateToken(
+      { id: result.data.id, email: result.data.email },
+      { expiresIn: "7d" }
+    );
 
     return res.status(201).json({
       success: true,
       message: result.message,
+      user: result.data,
+      token,
       data: result.data,
       error: null,
     });
@@ -41,6 +47,7 @@ const loginUser = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: result.message,
+      user: result.data,
       data: result.data,
       token,
       error: null,

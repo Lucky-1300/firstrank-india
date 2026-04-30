@@ -8,12 +8,6 @@ import { Zap, Lock, Sparkles } from "lucide-react";
 export default function Dashboard() {
   const navigate = useNavigate();
   // const [user, setUser] = useState(null);
-  const [user, setUser] = useState({
-  name: "Loading...",
-  email: "",
-  category: "",
-});
-
   const getSafeStoredUser = () => {
     try {
       const rawUser = localStorage.getItem("user");
@@ -24,6 +18,14 @@ export default function Dashboard() {
     }
   };
 
+  const [user, setUser] = useState(
+    getSafeStoredUser() || {
+      name: "Guest",
+      email: "",
+      category: "student",
+    }
+  );
+
   useEffect(() => {
   const fetchProfile = async () => {
     try {
@@ -32,14 +34,14 @@ export default function Dashboard() {
 
       // ✅ DEV MODE (no backend / no login)
       if (!token) {
-        setUser({
-          name: "Utkarsh",
-          email: "demo@test.com",
+        setUser(storedUser || {
+          name: "Guest",
+          email: "",
           category: "student",
-          rank: 12,
-          totalTests: 15,
-          averageScore: 91,
-          skills: ["Logic", "Math", "Communication"],
+          rank: 0,
+          totalTests: 0,
+          averageScore: 0,
+          skills: [],
         });
         return;
       }
@@ -53,10 +55,10 @@ export default function Dashboard() {
       const res = await apiCall("/auth/profile", { method: "GET" });
 
       if (res.success) {
-        setUser(res.user);
+        setUser(res.user || res.data || storedUser || { name: "Guest", email: "", category: "student" });
 
         // ✅ keep local copy updated
-        localStorage.setItem("user", JSON.stringify(res.user));
+        localStorage.setItem("user", JSON.stringify(res.user || res.data));
       } else {
         navigate("/login");
       }

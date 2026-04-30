@@ -6,6 +6,37 @@ import { Clock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const STORAGE_KEY = "examState";
 
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+};
+
+const divisionCards = [
+  {
+    title: "6-8",
+    text: "Foundational skill checks for young learners building confidence early.",
+  },
+  {
+    title: "9-10",
+    text: "Competitive prep cards with sharper reasoning and exam discipline.",
+  },
+  {
+    title: "11-12",
+    text: "Higher secondary assessments for deeper aptitude and career direction.",
+  },
+  {
+    title: "UG",
+    text: "Undergraduate tests focused on employability, logic and problem solving.",
+  },
+  {
+    title: "PG",
+    text: "Postgraduate cards for advanced analysis, leadership and specialization.",
+  },
+];
+
 export default function Exam() {
   const navigate = useNavigate();
 
@@ -20,6 +51,9 @@ export default function Exam() {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [hasStarted, setHasStarted] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [selectedDivision, setSelectedDivision] = useState("");
   const [deadline, setDeadline] = useState(null);
   const [timeLeft, setTimeLeft] = useState(1800);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -101,6 +135,18 @@ useEffect(() => {
     );
   }, [answers, current, deadline, hasStarted]);
 
+  const openInstructions = () => {
+    if (!questions.length) return;
+    setAcceptedTerms(false);
+    setShowInstructions(true);
+  };
+
+  const beginDivisionExam = (division) => {
+    setSelectedDivision(division);
+    localStorage.setItem("selectedDivision", division);
+    openInstructions();
+  };
+
   const startExam = () => {
     if (hasStarted) return;
     const newDeadline = Date.now() + 1800 * 1000;
@@ -109,6 +155,7 @@ useEffect(() => {
     setDeadline(newDeadline);
     setTimeLeft(1800);
     setHasStarted(true);
+    setShowInstructions(false);
   };
 
   const formatTime = () => {
@@ -143,6 +190,7 @@ const submitExam = () => {
   if (isSubmitted) return;
 setIsSubmitted(true)
   const score = calculateScore();
+  const storedUser = getStoredUser();
 
   const payload = {
     answers: questions
@@ -200,8 +248,22 @@ setIsSubmitted(true)
             localStorage.removeItem("examState");
 
             navigate("/result", {
-              state: resultData.data.report,
-            });
+
+        state: {
+
+          score,
+
+          answers,
+
+          questions,
+
+          studentName: storedUser?.name,
+
+          studentEmail: storedUser?.email,
+
+        },
+
+      });
           });
       }, 1500);
     })
@@ -209,44 +271,128 @@ setIsSubmitted(true)
   };
 
   if (!hasStarted) {
+    if (showInstructions) {
+      return (
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <Card className="bg-white dark:bg-slate-900 border-2 border-orange-100 dark:border-slate-800 shadow-xl p-0 overflow-hidden">
+              <div className="border-b border-gray-200 dark:border-slate-800 px-6 sm:px-10 py-6 sm:py-8 text-center">
+                <p className="text-sm font-semibold text-orange-500 uppercase tracking-wider">Before You Begin</p>
+                <h1 className="mt-3 text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">
+                  {selectedDivision ? `Exam Instructions - ${selectedDivision}` : "Exam Instructions"}
+                </h1>
+                <p className="mt-3 text-gray-600 dark:text-slate-300">
+                  Read the instructions carefully, accept the terms, and then start the test.
+                </p>
+              </div>
+
+              <div className="max-h-[65vh] overflow-y-auto px-6 sm:px-10 py-6 sm:py-8 space-y-8">
+                <section>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 underline decoration-orange-500 decoration-2 underline-offset-4">
+                    General Instructions
+                  </h2>
+
+                  <div className="space-y-4 text-gray-700 dark:text-slate-300 leading-8">
+                    <p>1. The question palette on the right side of the screen shows the status of every question.</p>
+                    <p>2. You can move back and forth between questions before submitting the test.</p>
+                    <p>3. Each question can be answered once and reviewed before final submission.</p>
+                    <p>4. The timer starts only after you press the Start Exam button below.</p>
+                    <p>5. Once the test begins, keep the page open until you submit the exam.</p>
+                    <p>6. Make sure you have read and accepted the Terms of Service and Privacy Policy before proceeding.</p>
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-orange-100 dark:border-orange-500/20 bg-orange-50/70 dark:bg-orange-500/10 p-5 sm:p-6">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    Terms and Privacy Confirmation
+                  </h2>
+
+                  <label className="flex items-start gap-3 cursor-pointer text-gray-700 dark:text-slate-300 leading-7">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-1 h-5 w-5 accent-orange-500 cursor-pointer"
+                    />
+                    <span>
+                      I confirm that I have read and accepted the Terms of Service and Privacy Policy for this exam.
+                    </span>
+                  </label>
+                </section>
+
+                <div className="rounded-2xl bg-gray-50 dark:bg-slate-800 p-5 sm:p-6 border border-gray-200 dark:border-slate-700">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">Important</p>
+                  <p className="mt-2 text-gray-700 dark:text-slate-300 leading-7">
+                    Once you start, the clock will begin immediately and you will be taken to the first question.
+                  </p>
+                </div>
+              </div>
+
+              <div className="sticky bottom-0 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 sm:px-10 py-5 sm:py-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowInstructions(false)}
+                    className="w-full sm:w-auto"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={startExam}
+                    disabled={!acceptedTerms || !questions.length}
+                    className="w-full sm:w-auto"
+                  >
+                    Start Exam
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </main>
+      );
+    }
+
     return (
       <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <Card className="bg-white dark:bg-slate-900 border-2 border-orange-100 dark:border-slate-800 shadow-xl p-8 sm:p-10 text-center">
-            <p className="text-sm font-semibold text-orange-500 uppercase tracking-wider">Exam Instructions</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-10">
+            <p className="text-sm font-semibold text-orange-500 uppercase tracking-wider">Exam Selection</p>
             <h1 className="mt-3 text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">
-              Ready to start your test?
+              Choose your division
             </h1>
             <p className="mt-4 text-gray-600 dark:text-slate-300 max-w-2xl mx-auto leading-8">
-              The timer will start only when you click Start Exam. You will get 30 minutes and can navigate across questions using the palette.
+              Select the exam card that matches your level. The instruction screen will open next.
             </p>
+          </div>
 
-            <div className="mt-8 grid sm:grid-cols-3 gap-4 text-left">
-              <div className="rounded-2xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 p-4">
-                <p className="text-sm text-gray-500 dark:text-slate-400">Total Questions</p>
-                <p className="text-2xl font-black text-orange-600 mt-1">{questions.length || totalQuestions}</p>
-              </div>
-              <div className="rounded-2xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 p-4">
-                <p className="text-sm text-gray-500 dark:text-slate-400">Duration</p>
-                <p className="text-2xl font-black text-orange-600 mt-1">30 min</p>
-              </div>
-              <div className="rounded-2xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 p-4">
-                <p className="text-sm text-gray-500 dark:text-slate-400">Navigation</p>
-                <p className="text-2xl font-black text-orange-600 mt-1">Flexible</p>
-              </div>
-            </div>
+          <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-5 items-stretch">
+            {divisionCards.map((item, i) => (
+              <Card key={item.title} className="h-full min-h-[340px] p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.35em] text-orange-500 font-bold">Exam Card</p>
+                    <h3 className="mt-4 text-4xl font-black text-gray-900 dark:text-white">{item.title}</h3>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center font-black text-lg">
+                    {i + 1}
+                  </div>
+                </div>
 
-            <div className="mt-10 flex justify-center">
-              <Button
-                size="lg"
-                onClick={startExam}
-                disabled={!questions.length}
-                className="min-w-52"
-              >
-                {questions.length ? "Start Exam" : "Loading Questions..."}
-              </Button>
-            </div>
-          </Card>
+                <p className="mt-6 flex-1 text-base leading-8 text-gray-600 dark:text-slate-300 transition-colors duration-300">
+                  {item.text}
+                </p>
+
+                <Button
+                  size="lg"
+                  className="mt-8 w-full"
+                  onClick={() => beginDivisionExam(item.title)}
+                  disabled={!questions.length}
+                >
+                  {questions.length ? "Start This Test" : "Loading Questions..."}
+                </Button>
+              </Card>
+            ))}
+          </div>
         </div>
       </main>
     );

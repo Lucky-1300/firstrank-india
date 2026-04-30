@@ -83,7 +83,15 @@ if (formData.password.length < 8) {
 if (res.success) {
   alert("You are signed up successfully 🎉");
 
-  navigate("/");
+  const user = res.user || res.data;
+  if (res.token) {
+    localStorage.setItem("authToken", res.token);
+  }
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+
+  navigate("/dashboard");
 }
       else {
         // setError(res.message || "Registration failed");
