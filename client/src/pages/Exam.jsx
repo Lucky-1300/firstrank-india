@@ -188,8 +188,8 @@ useEffect(() => {
 
 const submitExam = () => {
   if (isSubmitted) return;
-setIsSubmitted(true)
-  const score = calculateScore();
+  setIsSubmitted(true);
+
   const storedUser = getStoredUser();
 
   const payload = {
@@ -203,14 +203,11 @@ setIsSubmitted(true)
         };
       })
       .filter(Boolean),
-    score,
     timeTaken: 1800 - timeLeft,
   };
 
   const token = localStorage.getItem("authToken");
-
-  console.log("TOKEN:", token);
-  console.log("PAYLOAD:", payload);
+  const userId = storedUser?.id || localStorage.getItem("userId");
 
   fetch("http://localhost:3000/api/exam/submit", {
     method: "POST",
@@ -222,53 +219,57 @@ setIsSubmitted(true)
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log("Submit response:", data);
+      if (!data.success) {
+        setIsSubmitted(false);
+        return;
+      }
 
-      if (!data.success) return;
+      // Use the actual score calculated by the backend
+      const actualScore = data.data?.summary?.percentage || 0;
+      const correctCount = data.data?.summary?.correct || 0;
+      const totalQuestions = data.data?.summary?.total || 0;
 
-      // ✅ TOKEN se userId nikaal rahe
-      const tokenData = JSON.parse(atob(token.split(".")[1]));
-      // const userId = tokenData.id;
-      const userId = localStorage.getItem("userId");
-
-      setTimeout(() => {
-        fetch(`http://localhost:3000/api/result/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      const finishNavigation = () => {
+        localStorage.removeItem("examState");
+        navigate("/result", {
+          state: {
+            score: actualScore,
+            correctCount,
+            totalQuestions,
+            answers,
+            questions,
+            studentName: storedUser?.name,
+            studentEmail: storedUser?.email,
           },
-        })
-          .then((res) => res.json())
-          .then((resultData) => {
-            console.log("Result API:", resultData);
+        });
+      };
 
-            if (!resultData.success) return;
+      if (!userId) {
+        finishNavigation();
+        return;
+      }
 
-            setResult(resultData.data);
-
-            localStorage.removeItem("examState");
-
-            navigate("/result", {
-
-        state: {
-
-          score,
-
-          answers,
-
-          questions,
-
-          studentName: storedUser?.name,
-
-          studentEmail: storedUser?.email,
-
+      fetch(`http://localhost:3000/api/result/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-
-      });
-          });
-      }, 1500);
+      })
+        .then((res) => res.json())
+        .then((resultData) => {
+          if (resultData.success) {
+            setResult(resultData.data);
+          }
+          finishNavigation();
+        })
+        .catch(() => {
+          finishNavigation();
+        });
     })
-    .catch((err) => console.log(err));
-  };
+    .catch((err) => {
+      setIsSubmitted(false);
+      console.log(err);
+    });
+};
 
   if (!hasStarted) {
     if (showInstructions) {
