@@ -14,10 +14,20 @@ import {
   Target,
 } from "lucide-react";
 
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+};
+
 export default function Result() {
   const location = useLocation();
   const score = location.state?.score || 78;
-  const studentName = location.state?.studentName || "Utkarsh";
+  const storedUser = getStoredUser();
+  const studentName = location.state?.studentName || storedUser?.name || "Student";
+  const studentEmail = location.state?.studentEmail || storedUser?.email || "";
 
   const skills = [
     ["Logic", 85],
@@ -76,6 +86,12 @@ export default function Result() {
           <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">
             🎉 Report for {studentName}
           </h1>
+
+          {studentEmail && (
+            <p className="mt-3 text-sm sm:text-base text-gray-500 dark:text-slate-400 break-all transition-colors duration-300">
+              {studentEmail}
+            </p>
+          )}
 
           <p className="mt-4 text-sm sm:text-lg text-gray-600 dark:text-slate-300 max-w-2xl mx-auto transition-colors duration-300">
             Congratulations! Here is your detailed performance report and insights.

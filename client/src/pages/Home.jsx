@@ -32,6 +32,11 @@ export default function Home() {
       navigate("/login");
     }
   };
+
+  const handleDivisionStart = (division) => {
+    localStorage.setItem("selectedDivision", division);
+    handleStartTest();
+  };
   const heroSlides = useMemo(
     () => [
       {
@@ -95,6 +100,29 @@ export default function Home() {
     "Career Mapping",
     "Progress Tracking",
     "Gamified Learning",
+  ];
+
+  const divisionCards = [
+    {
+      title: "6-8",
+      text: "Foundational skill checks for young learners building confidence early.",
+    },
+    {
+      title: "9-10",
+      text: "Competitive prep cards with sharper reasoning and exam discipline.",
+    },
+    {
+      title: "11-12",
+      text: "Higher secondary assessments for deeper aptitude and career direction.",
+    },
+    {
+      title: "UG",
+      text: "Undergraduate tests focused on employability, logic and problem solving.",
+    },
+    {
+      title: "PG",
+      text: "Postgraduate cards for advanced analysis, leadership and specialization.",
+    },
   ];
 
   const testimonials = [
@@ -244,6 +272,56 @@ export default function Home() {
               <p className="text-gray-600 dark:text-slate-300 mt-2 transition-colors duration-300">{item[1]}</p>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* DIVISIONS */}
+      <section className="px-6 pb-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
+                Division Wise Exams
+              </span>
+              <h2 className="mt-5 text-4xl font-black text-gray-900 dark:text-white transition-colors duration-300">
+                Choose the right exam card
+              </h2>
+            </div>
+
+            <Button variant="secondary" className="sm:self-end" onClick={handleStartTest}>
+              View Exam Flow <ArrowRight size={16} />
+            </Button>
+          </div>
+
+          <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-5 items-stretch">
+            {divisionCards.map((item, i) => (
+              <motion.div key={item.title} whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
+                <Card className="h-full min-h-[340px] p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-orange-500 font-bold">Exam Card</p>
+                      <h3 className="mt-4 text-4xl font-black text-gray-900 dark:text-white">{item.title}</h3>
+                    </div>
+                    <div className="w-14 h-14 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center font-black text-lg">
+                      {i + 1}
+                    </div>
+                  </div>
+
+                  <p className="mt-6 flex-1 text-base leading-8 text-gray-600 dark:text-slate-300 transition-colors duration-300">
+                    {item.text}
+                  </p>
+
+                  <Button
+                    size="lg"
+                    className="mt-8 w-full"
+                    onClick={() => handleDivisionStart(item.title)}
+                  >
+                    Start This Test
+                  </Button>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

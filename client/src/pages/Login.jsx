@@ -54,8 +54,11 @@ if (formData.password.length < 8) {
 
 
       if (res.success) {
+        const user = res.user || res.data;
         localStorage.setItem("authToken", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
+        if (user) {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
         
         // Redirect to the intended page or dashboard
         const redirectPath = localStorage.getItem("redirectAfterLogin");
