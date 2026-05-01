@@ -35,15 +35,23 @@ export default function Leaderboard() {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
-        setLeaders(nationalResponse?.data || []);
+        // Extract the data array from the response
+        const leadersData = nationalResponse?.data?.data || [];
+        setLeaders(Array.isArray(leadersData) ? leadersData : []);
 
         if (userId) {
-          const userResponse = await apiCall(`/ranking/user/${userId}`, {
-            method: "GET",
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          });
+          try {
+            const userResponse = await apiCall(`/ranking/user/${userId}`, {
+              method: "GET",
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
 
-          setCurrentUser(userResponse?.data || null);
+            setCurrentUser(userResponse?.data || null);
+          } catch (userErr) {
+            // User ranking not found is not a fatal error
+            console.log("User ranking not found:", userErr?.message);
+            setCurrentUser(null);
+          }
         }
       } catch (err) {
         setError(err?.message || "Failed to load leaderboard");
