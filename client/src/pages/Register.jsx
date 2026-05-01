@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { apiCall } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -14,7 +15,6 @@ export default function Register() {
     category: "student",
   });
 
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   // const handleChange = (e) => {
@@ -43,65 +43,30 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-if (!formData.name) {
-  setErrors({ name: "Name is required" });
-  return;
-}
-
-if (!formData.email) {
-  setErrors({ email: "Email is required" });
-  return;
-}
-if (formData.password.length < 8) {
-  setErrors({ password: "Password must be at least 8 characters" });
-  return;
-}
-
-
-    setLoading(true);
-
     try {
-      const res = await apiCall("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const nextErrors = {};
 
-      // if (res.success) {
-      //   localStorage.setItem("authToken", res.token);
-      //   localStorage.setItem("user", JSON.stringify(res.user));
-      //   navigate("/dashboard");
-      // } 
-//       if (res.success) {
-//   alert("You are signed up successfully 🎉");
+      if (!formData.name.trim()) nextErrors.name = "Name is required";
+      if (!formData.email.trim()) nextErrors.email = "Email is required";
+      if (!formData.password) nextErrors.password = "Password is required";
+      if (formData.password && formData.password.length < 8) {
+        nextErrors.password = "Password must be at least 8 characters";
+      }
 
-//   localStorage.setItem("authToken", res.token);
-//   localStorage.setItem("user", JSON.stringify(res.user));
+      if (Object.keys(nextErrors).length > 0) {
+        setErrors(nextErrors);
+        return;
+      }
 
-//   navigate("/");
-// }
-if (res.success) {
-  alert("You are signed up successfully 🎉");
+      const res = await register(formData);
 
-  const user = res.user || res.data;
-  if (res.token) {
-    localStorage.setItem("authToken", res.token);
-  }
-  if (user) {
-    localStorage.setItem("user", JSON.stringify(user));
-  }
-
-  navigate("/dashboard");
-}
-      else {
-        // setError(res.message || "Registration failed");
-        setErrors({ email: res.message || "Registration failed" });
+      if (res?.success) {
+        navigate("/dashboard");
+      } else {
+        setErrors({ email: res?.message || "Registration failed" });
       }
     } catch (err) {
-      // setError("Something went wrong");
-      setErrors({ email: "Something went wrong" });
-    } finally {
-      setLoading(false);
+      setErrors({ email: err?.message || "Something went wrong" });
     }
   };
 
@@ -143,11 +108,9 @@ if (res.success) {
             It takes less than a minute
           </p>
 
-          {/* {error && (
-            <div className="mb-4 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">
-              {error}
-            </div>
-          )} */}
+          <div className="mb-4 rounded-xl bg-orange-50 text-orange-700 border border-orange-200 px-4 py-3 text-sm">
+            Create your account to unlock testing, ranking and result tracking.
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -218,8 +181,8 @@ if (res.success) {
               <option value="institution">Institution</option>
             </select> */}
 
-            <Button fullWidth size="lg" disabled={loading}>
-              {loading ? "Creating..." : "Create Free Account"}
+            <Button fullWidth size="lg" loading={loading}>
+              Create Free Account
             </Button>
           </form>
 

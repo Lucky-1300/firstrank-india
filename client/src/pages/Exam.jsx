@@ -3,6 +3,8 @@ import Button from "../components/Button";
 import Card from "../components/Card";
 import { useNavigate } from "react-router-dom";
 import { Clock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { apiCall } from "../services/api";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const STORAGE_KEY = "examState";
 
@@ -43,7 +45,7 @@ export default function Exam() {
   
   const [questions, setQuestions] = useState([]);
 
-  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
 
 
 
@@ -57,18 +59,26 @@ export default function Exam() {
   const [deadline, setDeadline] = useState(null);
   const [timeLeft, setTimeLeft] = useState(1800);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   // const totalQuestions = 45;
   const totalQuestions = questions.length;
 
 
 // FETCH QUESTIONS
 useEffect(() => {
-  fetch("http://localhost:3000/api/exam/questions")
-    .then((res) => res.json())
+  setError("");
+  setIsLoadingQuestions(true);
+  apiCall("/exam/questions")
     .then((data) => {
       setQuestions(data?.data);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error(err);
+      setError(err?.message || "Failed to load exam questions");
+    })
+    .finally(() => {
+      setIsLoadingQuestions(false);
+    });
 }, []);
 
 useEffect(() => {
@@ -209,18 +219,17 @@ const submitExam = () => {
   const token = localStorage.getItem("authToken");
   const userId = storedUser?.id || localStorage.getItem("userId");
 
-  fetch("http://localhost:3000/api/exam/submit", {
+  apiCall("/exam/submit", {
     method: "POST",
+    body: JSON.stringify(payload),
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload),
   })
-    .then((res) => res.json())
     .then((data) => {
       if (!data.success) {
         setIsSubmitted(false);
+        setError(data.message || "Failed to submit exam");
         return;
       }
 
@@ -236,6 +245,7 @@ const submitExam = () => {
             score: actualScore,
             correctCount,
             totalQuestions,
+            resultData: data.data,
             answers,
             questions,
             studentName: storedUser?.name,
@@ -249,33 +259,48 @@ const submitExam = () => {
         return;
       }
 
-      fetch(`http://localhost:3000/api/result/${userId}`, {
+      apiCall(`/result/${userId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => res.json())
         .then((resultData) => {
           if (resultData.success) {
-            setResult(resultData.data);
+            // Result details are fetched for confirmation; navigation happens below.
           }
           finishNavigation();
         })
         .catch(() => {
+          setError("Saved your exam, but result details could not be loaded.");
           finishNavigation();
         });
     })
     .catch((err) => {
       setIsSubmitted(false);
-      console.log(err);
+      setError(err?.message || "Failed to submit exam");
+      console.error(err);
     });
 };
 
   if (!hasStarted) {
+    if (isLoadingQuestions) {
+      return (
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+          <LoadingSpinner fullScreen label="Loading exam questions..." />
+        </main>
+      );
+    }
+
     if (showInstructions) {
       return (
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            {error && (
+              <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                {error}
+              </div>
+            )}
             <Card className="bg-white dark:bg-slate-900 border-2 border-orange-100 dark:border-slate-800 shadow-xl p-0 overflow-hidden">
               <div className="border-b border-gray-200 dark:border-slate-800 px-6 sm:px-10 py-6 sm:py-8 text-center">
                 <p className="text-sm font-semibold text-orange-500 uppercase tracking-wider">Before You Begin</p>
@@ -356,6 +381,11 @@ const submitExam = () => {
     return (
       <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {error && (
+            <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+              {error}
+            </div>
+          )}
           <div className="text-center mb-8 sm:mb-10">
             <p className="text-sm font-semibold text-orange-500 uppercase tracking-wider">Exam Selection</p>
             <h1 className="mt-3 text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">

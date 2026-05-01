@@ -13,6 +13,10 @@ import {
   Users,
   Target,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { apiCall } from "../services/api";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../hooks/useAuth";
 
 const getStoredUser = () => {
   try {
@@ -24,27 +28,76 @@ const getStoredUser = () => {
 
 export default function Result() {
   const location = useLocation();
-  const score = location.state?.score || 0;
-  const correctCount = location.state?.correctCount || 0;
-  const totalQuestions = location.state?.totalQuestions || 29;
+  const { user: authUser } = useAuth();
   const storedUser = getStoredUser();
-  const studentName = location.state?.studentName || storedUser?.name || "Student";
-  const studentEmail = location.state?.studentEmail || storedUser?.email || "";
+  const sessionUser = authUser || storedUser;
+  const studentName = location.state?.studentName || sessionUser?.name || "Student";
+  const studentEmail = location.state?.studentEmail || sessionUser?.email || "";
+  const [resultData, setResultData] = useState(location.state?.resultData || null);
+  const [loading, setLoading] = useState(!location.state?.resultData);
+  const [error, setError] = useState("");
+
+  const score = resultData?.report?.score ?? location.state?.score ?? 0;
+  const correctCount = resultData?.report?.correctCount ?? location.state?.correctCount ?? 0;
+  const totalQuestions = resultData?.report?.total ?? location.state?.totalQuestions ?? 29;
+  const sectionScores = resultData?.report?.sectionScores || location.state?.sectionScores || {};
+  const rank = resultData?.rank ?? location.state?.rank ?? null;
 
   const scorePercent = Math.round(score);
 
-  const skills = [
-    ["Logic", scorePercent],
-    ["Decision Making", scorePercent],
-    ["Finance", scorePercent],
-    ["Leadership", scorePercent],
-  ];
+  useEffect(() => {
+    const loadResult = async () => {
+      const token = localStorage.getItem("authToken");
+      const userId = sessionUser?.id || localStorage.getItem("userId");
+
+      if (!userId || resultData) {
+        setLoading(false);
+        return;
+      }
+
+      if (!token) {
+        setError("Please log in to view your result.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await apiCall(`/result/${userId}`, { method: "GET" });
+        if (response.success) {
+          setResultData(response.data);
+        } else {
+          setError(response.message || "Failed to load result");
+        }
+      } catch (err) {
+        setError(err?.message || "Failed to load result");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadResult();
+  }, [resultData, sessionUser?.id]);
+
+  const skills = useMemo(() => {
+    const entries = Object.entries(sectionScores || {});
+
+    if (entries.length > 0) {
+      return entries.map(([name, value]) => [name, Number(value) || 0]);
+    }
+
+    return [
+      ["Logic", scorePercent],
+      ["Decision Making", scorePercent],
+      ["Finance", scorePercent],
+      ["Leadership", scorePercent],
+    ];
+  }, [sectionScores, scorePercent]);
 
   const stats = [
-    { label: "City Rank", value: "#2", icon: MapPin },
-    { label: "State Rank", value: "#9", icon: Trophy },
-    { label: "National Rank", value: "#18", icon: Award },
-    { label: "Percentile", value: "95%", icon: TrendingUp },
+    { label: "City Rank", value: rank ? `#${rank}` : "—", icon: MapPin },
+    { label: "State Rank", value: rank ? `#${rank}` : "—", icon: Trophy },
+    { label: "National Rank", value: rank ? `#${rank}` : "—", icon: Award },
+    { label: "Percentile", value: `${Math.min(100, Math.max(0, scorePercent))}%`, icon: TrendingUp },
   ];
 
   const careers = [
@@ -87,6 +140,14 @@ export default function Result() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 sm:py-10 lg:py-14 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {loading && <LoadingSpinner fullScreen label="Loading your result..." />}
+
+        {error && (
+          <div className="mb-6 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Header */}
         <section className="text-center mb-8 sm:mb-10">
@@ -135,7 +196,7 @@ export default function Result() {
               </p>
 
               <div className="inline-block px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 font-semibold">
-                🏆 National Rank #18
+                🏆 National Rank {rank ? `#${rank}` : "—"}
               </div>
             </div>
           </Card>
@@ -161,9 +222,9 @@ export default function Result() {
         {/* Rank Section */}
         <section className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
           {[
-            ["City Rank", "#2", "You are among the top students in your city.", false],
-            ["State Rank", "#9", "You are in the top group across your state.", false],
-            ["National Rank", "#18", "Your current national rank is highlighted here.", true],
+            ["City Rank", stats[0].value, "You are among the top students in your city.", false],
+            ["State Rank", stats[1].value, "You are in the top group across your state.", false],
+            ["National Rank", stats[2].value, "Your current national rank is highlighted here.", true],
           ].map(([label, value, text, highlight]) => (
             <Card
               key={label}
@@ -246,6 +307,36 @@ export default function Result() {
           </Card>
         </section>
 
+        <section className="mb-8 sm:mb-10">
+          <Card className="shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center gap-3 mb-6">
+              <BarChart3 className="text-orange-500" size={24} />
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                Section Scores
+              </h3>
+            </div>
+
+            <div className="space-y-5">
+              {skills.map(([name, value], i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-gray-700 dark:text-slate-300 text-sm sm:text-base transition-colors duration-300">
+                      {name}
+                    </span>
+                    <span className="text-orange-600 font-bold text-sm">{value}%</span>
+                  </div>
+                  <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden transition-colors duration-300">
+                    <div
+                      className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
+
         {/* Detailed Report Cards */}
         <section className="mb-8 sm:mb-10">
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -273,6 +364,12 @@ export default function Result() {
           <Button size="lg" className="w-full sm:w-auto">
             📥 Download Report
           </Button>
+
+          <Link to="/reports" className="w-full sm:w-auto">
+            <Button variant="secondary" size="lg" className="w-full">
+              📄 View Full Report
+            </Button>
+          </Link>
 
           <Link to="/leaderboard" className="w-full sm:w-auto">
             <Button variant="secondary" size="lg" className="w-full">

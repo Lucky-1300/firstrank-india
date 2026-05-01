@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
+import { useAuth } from "../hooks/useAuth";
 import {
   BookOpen,
   LayoutDashboard,
@@ -24,14 +25,7 @@ export default function Navbar() {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const token = localStorage.getItem("authToken");
-  const storedUser = useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      return null;
-    }
-  }, [token]);
+  const { user: storedUser, isAuthenticated: token, logout } = useAuth();
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -69,8 +63,7 @@ export default function Navbar() {
       : "text-gray-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-300";
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    logout();
     navigate("/");
   };
 

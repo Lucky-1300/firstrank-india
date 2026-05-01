@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { apiCall } from "../services/api";
 import { Zap, Lock, Sparkles } from "lucide-react";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user: authUser, ready } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   // const [user, setUser] = useState(null);
   const getSafeStoredUser = () => {
     try {
@@ -19,7 +23,7 @@ export default function Dashboard() {
   };
 
   const [user, setUser] = useState(
-    getSafeStoredUser() || {
+    authUser || getSafeStoredUser() || {
       name: "Guest",
       email: "",
       category: "student",
@@ -30,7 +34,7 @@ export default function Dashboard() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      const storedUser = getSafeStoredUser();
+      const storedUser = authUser || getSafeStoredUser();
 
       // ✅ DEV MODE (no backend / no login)
       if (!token) {
@@ -43,6 +47,7 @@ export default function Dashboard() {
           averageScore: 0,
           skills: [],
         });
+        setIsLoading(false);
         return;
       }
 
@@ -73,19 +78,30 @@ export default function Dashboard() {
         localStorage.removeItem("authToken");
         navigate("/login");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   fetchProfile();
-}, [navigate]);
+}, [navigate, authUser]);
 
 
-const stats = [
+if (!ready || isLoading) {
+  return (
+    <main className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <LoadingSpinner fullScreen label="Loading dashboard..." />
+    </main>
+  );
+}
+
+
+  const stats = useMemo(() => [
   { label: "Your Rank", value:` #${user?.rank || 42}` },
   { label: "Tests Completed", value: user?.totalTests || 12 },
   { label: "Average Score", value:` ${user?.averageScore || 88}% `},
   { label: "Skills Gained", value: user?.skills?.length || 6 },
-];
+], [user]);
 
 
   const progress = [

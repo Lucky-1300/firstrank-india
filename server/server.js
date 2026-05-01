@@ -13,10 +13,20 @@ dotenv.config();
 
 const app = express();
 app.disable("x-powered-by");
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+);
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (req, res) => {
   return res.status(200).json({
