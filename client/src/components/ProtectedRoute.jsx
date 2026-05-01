@@ -1,10 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
+import LoadingSpinner from "./LoadingSpinner";
+import { useAuth } from "../hooks/useAuth";
 
 export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("authToken");
   const location = useLocation();
+  const { isAuthenticated, ready } = useAuth();
 
-  if (!token) {
+  if (!ready) {
+    return <LoadingSpinner fullScreen label="Checking your session..." />;
+  }
+
+  if (!isAuthenticated) {
     // Store the intended destination before redirecting to login
     localStorage.setItem("redirectAfterLogin", location.pathname);
     return <Navigate to="/login" />;

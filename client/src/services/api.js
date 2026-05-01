@@ -1,40 +1,38 @@
-
-const API_URL = "http://localhost:3000/api";
+import api from "../config/axios";
 
 export const apiCall = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('authToken');
-  const controller = new AbortController();
-  const timeoutMs = options.timeoutMs || 10000;
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  const { timeoutMs: _timeoutMs, ...fetchOptions } = options;
-  const headers = {
-    'Content-Type': 'application/json',
-    ...fetchOptions.headers
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...fetchOptions,
-      headers,
-      signal: controller.signal,
+    const {
+      method = "GET",
+      body,
+      data,
+      headers: customHeaders = {},
+      params,
+      timeoutMs = 10000,
+      ...rest
+    } = options;
+
+    const token = localStorage.getItem("authToken");
+    const payload = data ?? (typeof body === "string" ? JSON.parse(body) : body);
+
+    const response = await api.request({
+      url: endpoint,
+      method,
+      data: payload,
+      params,
+      timeout: timeoutMs,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...customHeaders,
+      },
+      ...rest,
     });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response.json();
+    return response.data;
   } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new Error('API timeout: Request took too long');
+    if (error.code === "ECONNABORTED") {
+      throw new Error("API timeout: Request took too long");
     }
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+    throw new Error(error?.response?.data?.message || error.message || "API request failed");
   }
 };

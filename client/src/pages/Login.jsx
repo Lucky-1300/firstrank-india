@@ -1,19 +1,27 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { apiCall } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const sessionMessage = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("session") === "expired"
+      ? "Your session expired. Please log in again."
+      : "";
+  }, [location.search]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -25,51 +33,28 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-if (!formData.email) {
-  setErrors({ email: "Email is required" });
-  return;
-}
-
-if (!formData.password) {
-  setErrors({ password: "Password is required" });
-  return;
-}
-
-if (formData.password.length < 8) {
-  setErrors({ password: "Password must be at least 8 characters" });
-  return;
-}
-
-    setLoading(true);
-
     try {
-      const res = await apiCall("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-       
+      const nextErrors = {};
 
-      console.log("LOGIN RESPONSE",res)
+      if (!formData.email.trim()) nextErrors.email = "Email is required";
+      if (!formData.password) nextErrors.password = "Password is required";
 
+      if (Object.keys(nextErrors).length > 0) {
+        setErrors(nextErrors);
+        return;
+      }
 
+      const res = await login(formData.email.trim(), formData.password);
 
-      if (res.success) {
-        const user = res.user || res.data;
-        localStorage.setItem("authToken", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
-        localStorage.setItem("userId", res.data.id); // ✅ ADD THI
-        
-        // Redirect to the intended page or dashboard
+      if (res?.success) {
         const redirectPath = localStorage.getItem("redirectAfterLogin");
-        localStorage.removeItem("redirectAfterLogin"); // Clean up
+        localStorage.removeItem("redirectAfterLogin");
         navigate(redirectPath || "/dashboard");
       } else {
-        setErrors({ password: res.message || "Login failed" });
+        setErrors({ password: res?.message || "Login failed" });
       }
     } catch (err) {
-     setErrors({ password: "Something went wrong" });
-    } finally {
-      setLoading(false);
+      setErrors({ password: err?.message || "Something went wrong" });
     }
   };
 
@@ -111,11 +96,11 @@ if (formData.password.length < 8) {
             Access your dashboard instantly
           </p>
 
-          {/* {error && (
-            <div className="mb-4 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">
-              {error}
+          {sessionMessage && (
+            <div className="mb-4 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 px-4 py-3 text-sm">
+              {sessionMessage}
             </div>
-          )} */}
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -157,8 +142,8 @@ if (formData.password.length < 8) {
 
             </div>
 
-            <Button fullWidth size="lg" disabled={loading}>
-              {loading ? "Signing In..." : "Login"}
+            <Button fullWidth size="lg" loading={loading}>
+              Login
             </Button>
           </form>
 
