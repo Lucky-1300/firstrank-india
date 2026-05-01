@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(readStoredToken());
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(readStoredToken()));
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
   const logoutTimerRef = useRef(null);
 
   const clearSession = useCallback(() => {
@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
+    setReady(true);
   }, []);
 
   const saveAuthSession = useCallback((data) => {
@@ -44,14 +45,14 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const data = await loginUser({ email, password });
-    saveAuthSession(data);
+      saveAuthSession(data);
       return data;
     } catch (error) {
       throw error;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [saveAuthSession]);
 
   const register = useCallback(async (userData) => {
     setLoading(true);
@@ -76,13 +77,11 @@ export function AuthProvider({ children }) {
         window.clearTimeout(logoutTimerRef.current);
         logoutTimerRef.current = null;
       }
-      setReady(true);
       return;
     }
 
     if (isTokenExpired(token)) {
       clearSession();
-      setReady(true);
       return;
     }
 
@@ -94,8 +93,6 @@ export function AuthProvider({ children }) {
         clearSession();
       }, msUntilExpiry);
     }
-
-    setReady(true);
   }, [token, clearSession]);
 
   useEffect(() => {

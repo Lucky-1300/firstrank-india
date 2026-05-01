@@ -11,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user: authUser, ready } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  // const [user, setUser] = useState(null);
+  
   const getSafeStoredUser = () => {
     try {
       const rawUser = localStorage.getItem("user");
@@ -30,78 +30,82 @@ export default function Dashboard() {
     }
   );
 
-  useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const storedUser = authUser || getSafeStoredUser();
-
-      // ✅ DEV MODE (no backend / no login)
-      if (!token) {
-        setUser(storedUser || {
-          name: "Guest",
-          email: "",
-          category: "student",
-          rank: 0,
-          totalTests: 0,
-          averageScore: 0,
-          skills: [],
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // ✅ If user already stored (fast load)
-      if (storedUser) {
-        setUser(storedUser);
-      }
-
-      // 🔐 Try fetching latest data from backend
-      const res = await apiCall("/auth/profile", { method: "GET" });
-
-      if (res.success) {
-        setUser(res.user || res.data || storedUser || { name: "Guest", email: "", category: "student" });
-
-        // ✅ keep local copy updated
-        localStorage.setItem("user", JSON.stringify(res.user || res.data));
-      } else {
-        navigate("/login");
-      }
-    } catch (error) {
-      console.error("Dashboard error:", error);
-
-      // fallback to stored user
-      const storedUser = getSafeStoredUser();
-      if (storedUser) {
-        setUser(storedUser);
-      } else {
-        localStorage.removeItem("authToken");
-        navigate("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  fetchProfile();
-}, [navigate, authUser]);
-
-
-if (!ready || isLoading) {
-  return (
-    <main className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <LoadingSpinner fullScreen label="Loading dashboard..." />
-    </main>
-  );
-}
-
-
+  // Move useMemo before useEffect and early returns
   const stats = useMemo(() => [
-  { label: "Your Rank", value:` #${user?.rank || 42}` },
-  { label: "Tests Completed", value: user?.totalTests || 12 },
-  { label: "Average Score", value:` ${user?.averageScore || 88}% `},
-  { label: "Skills Gained", value: user?.skills?.length || 6 },
-], [user]);
+    { label: "Your Rank", value: `#${user?.rank || 42}` },
+    { label: "Tests Completed", value: user?.totalTests || 12 },
+    { label: "Average Score", value: `${user?.averageScore || 88}%` },
+    { label: "Skills Gained", value: user?.skills?.length || 6 },
+  ], [user]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const storedUser = authUser || getSafeStoredUser();
+
+        // ✅ DEV MODE (no backend / no login)
+        if (!token) {
+          setUser(storedUser || {
+            name: "Guest",
+            email: "",
+            category: "student",
+            rank: 0,
+            totalTests: 0,
+            averageScore: 0,
+            skills: [],
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // ✅ If user already stored (fast load)
+        if (storedUser) {
+          setUser(storedUser);
+          setIsLoading(false);
+          return;
+        }
+
+        // 🔐 Try fetching latest data from backend
+        const res = await apiCall("/auth/profile", { method: "GET" });
+
+        if (res?.success && (res.user || res.data)) {
+          const userData = res.user || res.data;
+          setUser(userData);
+          // ✅ keep local copy updated
+          localStorage.setItem("user", JSON.stringify(userData));
+        } else if (storedUser) {
+          // If profile fetch fails but we have stored user, use it
+          setUser(storedUser);
+        } else {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Dashboard error:", error);
+
+        // fallback to stored user
+        const storedUser = getSafeStoredUser();
+        if (storedUser) {
+          setUser(storedUser);
+        } else {
+          localStorage.removeItem("authToken");
+          navigate("/login");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate, authUser]);
+
+  if (!ready || isLoading) {
+    return (
+      <main className="min-h-screen bg-gray-50 dark:bg-slate-950">
+        <LoadingSpinner fullScreen label="Loading dashboard..." />
+      </main>
+    );
+  }
 
 
   const progress = [

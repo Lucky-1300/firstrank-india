@@ -2,7 +2,7 @@ export default function LoadingSpinner({ label = "Loading...", fullScreen = fals
   return (
     <div
       className={`flex items-center justify-center gap-3 text-sm text-orange-600 ${
-        fullScreen ? "min-h-[50vh]" : ""
+        fullScreen ? "min-h-screen" : ""
       }`}
       role="status"
       aria-live="polite"
