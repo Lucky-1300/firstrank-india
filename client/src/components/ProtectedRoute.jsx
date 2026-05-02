@@ -10,11 +10,16 @@ export default function ProtectedRoute({ children }) {
     return <LoadingSpinner fullScreen label="Checking your session..." />;
   }
 
-  if (!isAuthenticated) {
-    // Store the intended destination before redirecting to login
-    localStorage.setItem("redirectAfterLogin", location.pathname);
-    return <Navigate to="/login" />;
-  }
+  // if (!isAuthenticated) {
+  //   // Store the intended destination before redirecting to login
+  //   localStorage.setItem("redirectAfterLogin", location.pathname);
+  //   return <Navigate to="/login" />;
+  // }
+const token = localStorage.getItem("token");
 
+if (!token || !isAuthenticated) {
+  localStorage.setItem("redirectAfterLogin", location.pathname);
+  return <Navigate to="/login" replace />;
+}
   return children;
 }

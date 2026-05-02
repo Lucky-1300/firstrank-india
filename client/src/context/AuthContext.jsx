@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(readStoredToken());
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(readStoredToken()));
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(true);
+  const [ready, setReady] = useState(false);
   const logoutTimerRef = useRef(null);
 
   const clearSession = useCallback(() => {
@@ -70,6 +70,30 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     clearSession();
   }, [clearSession]);
+
+
+  useEffect(() => {
+  const storedToken = readStoredToken();
+
+  if (!storedToken || isTokenExpired(storedToken)) {
+    clearSession();
+  } else {
+    setIsAuthenticated(true);
+  }
+
+  setReady(true);
+}, []);
+
+
+
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     if (!token) {

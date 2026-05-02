@@ -26,6 +26,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user: storedUser, isAuthenticated: token, logout } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -48,6 +49,24 @@ export default function Navbar() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+useEffect(() => {
+  const checkToken = () => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  };
+
+  const interval = setInterval(checkToken, 500);
+  return () => clearInterval(interval);
+}, []);
+
+
+
+
+
+
+
+
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
@@ -68,7 +87,7 @@ export default function Navbar() {
   };
 
   const handleStartTest = () => {
-    if (token) {
+    if (isLoggedIn) {
       navigate("/exam");
     } else {
       navigate("/login");
@@ -105,7 +124,7 @@ export default function Navbar() {
 
       
         <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-          {token ? (
+          {isLoggedIn ? (
             <>
               <Link key="home" to="/" className={`transition-colors duration-300 ${activeClass("/")}`}>
                 Home
@@ -143,7 +162,7 @@ export default function Navbar() {
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {token ? (
+          {isLoggedIn ? (
             <div className="relative flex items-center gap-3">
               <Link to="/dashboard">
                 <Button variant="secondary" size="sm" className="flex items-center gap-2">
