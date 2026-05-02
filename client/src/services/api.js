@@ -12,7 +12,8 @@ export const apiCall = async (endpoint, options = {}) => {
       ...rest
     } = options;
 
-    const token = localStorage.getItem("authToken");
+    // const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token")
     const payload = data ?? (typeof body === "string" ? JSON.parse(body) : body);
 
     const response = await api.request({
@@ -29,10 +30,24 @@ export const apiCall = async (endpoint, options = {}) => {
     });
 
     return response.data;
+  // } catch (error) {
+  //   if (error.code === "ECONNABORTED") {
+  //     throw new Error("API timeout: Request took too long");
+  //   }
+  //   throw new Error(error?.response?.data?.message || error.message || "API request failed");
+  // }
   } catch (error) {
-    if (error.code === "ECONNABORTED") {
-      throw new Error("API timeout: Request took too long");
-    }
-    throw new Error(error?.response?.data?.message || error.message || "API request failed");
+  if (error.code === "ECONNABORTED") {
+    throw new Error("API timeout: Request took too long");
   }
+
+  if (error?.response?.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+
+  throw new Error(
+    error?.response?.data?.message || "Request failed, please try again"
+  );
+}
 };

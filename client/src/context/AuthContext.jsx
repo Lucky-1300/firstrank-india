@@ -4,24 +4,37 @@ import { fetchProfile, loginUser, registerUser } from "../services/authService";
 
 export const AuthContext = createContext();
 
+
+
+
+
+
+
+
+
+
+
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(readStoredUser());
   const [token, setToken] = useState(readStoredToken());
-  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(readStoredToken()));
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(true);
+  const [ready, setReady] = useState(false);
   const logoutTimerRef = useRef(null);
 
   const clearSession = useCallback(() => {
     if (logoutTimerRef.current) {
-      window.clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-    clearStoredAuth();
-    setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
-    setReady(true);
+  window.clearTimeout(logoutTimerRef.current);
+  logoutTimerRef.current = null;
+}
+
+// 🔥 FORCE REMOVE (IMPORTANT)
+localStorage.removeItem("token");
+localStorage.removeItem("user");
+
+setUser(null);
+setToken(null);
+setReady(true);
   }, []);
 
   const saveAuthSession = useCallback((data) => {
@@ -35,7 +48,7 @@ export function AuthProvider({ children }) {
 
     setUser(nextUser);
     setToken(nextToken);
-    setIsAuthenticated(Boolean(nextToken));
+    // setIsAuthenticated(Boolean(nextToken));
     persistAuthSession({ token: nextToken, user: nextUser });
 
     return nextUser;
@@ -58,7 +71,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const data = await registerUser(userData);
-      saveAuthSession(data);
+      // saveAuthSession(data);
       return data;
     } catch (error) {
       throw error;
@@ -70,6 +83,34 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     clearSession();
   }, [clearSession]);
+
+useEffect(() => {
+  const checkToken = () => {
+    const token = readStoredToken();
+
+    if (!token) {
+      clearSession(); // 🔥 auto logout
+    }
+  };
+
+  const interval = setInterval(checkToken, 500); // fast detect
+
+  return () => clearInterval(interval);
+}, [clearSession]);
+
+
+  useEffect(() => {
+  const storedToken = readStoredToken();
+
+  
+
+if (!storedToken || isTokenExpired(storedToken)) {
+  clearSession();
+}
+
+  setReady(true);
+}, []);
+
 
   useEffect(() => {
     if (!token) {
@@ -109,7 +150,6 @@ export function AuthProvider({ children }) {
           persistAuthSession({ token, user: nextUser });
         }
       } catch {
-        // Keep local session if profile sync fails; interceptor will clear on 401.
       }
     };
 
@@ -117,15 +157,15 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   const value = useMemo(() => ({
-    user,
-    token,
-    isAuthenticated,
-    loading,
-    ready,
-    login,
-    register,
-    logout,
-  }), [user, token, isAuthenticated, loading, ready, login, register, logout]);
+  user,
+  token,
+  isAuthenticated: !!token,
+  loading,
+  ready,
+  login,
+  register,
+  logout,
+}), [user, token, loading, ready, login, register, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

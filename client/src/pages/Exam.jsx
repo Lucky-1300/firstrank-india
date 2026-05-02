@@ -70,12 +70,17 @@ useEffect(() => {
   setIsLoadingQuestions(true);
   apiCall("/exam/questions")
     .then((data) => {
-      setQuestions(data?.data);
+      setQuestions(data?.data || []);
     })
+    // .catch((err) => {
+    //   console.error(err);
+    //   setError(err?.message || "Failed to load exam questions");
+    // })
     .catch((err) => {
-      console.error(err);
-      setError(err?.message || "Failed to load exam questions");
-    })
+  console.error(err);
+  setQuestions([]);
+  setError(err?.message || "Failed to load exam questions");
+})
     .finally(() => {
       setIsLoadingQuestions(false);
     });
@@ -216,16 +221,17 @@ const submitExam = () => {
     timeTaken: 1800 - timeLeft,
   };
 
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token");
   const userId = storedUser?.id || localStorage.getItem("userId");
 
   apiCall("/exam/submit", {
     method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      Authorization: `Bearer ${token}`,
+    body:payload,
+    // body: JSON.stringify(payload),
+    // headers: {
+    //   Authorization: `Bearer ${token}`,
     },
-  })
+  )
     .then((data) => {
       if (!data.success) {
         setIsSubmitted(false);
@@ -278,7 +284,8 @@ const submitExam = () => {
     })
     .catch((err) => {
       setIsSubmitted(false);
-      setError(err?.message || "Failed to submit exam");
+      // setError(err?.message || "Failed to submit exam");
+      setError("Submission failed, please try again");
       console.error(err);
     });
 };

@@ -15,6 +15,7 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
 
   const sessionMessage = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -29,10 +30,12 @@ export default function Login() {
       [e.target.name]: e.target.value,
     }));
     setErrors({});
+    setApiError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
     try {
       const nextErrors = {};
 
@@ -53,9 +56,13 @@ export default function Login() {
       } else {
         setErrors({ password: res?.message || "Login failed" });
       }
-    } catch (err) {
-      setErrors({ password: err?.message || "Something went wrong" });
-    }
+    }catch (err) {
+  if (err?.response?.status === 500) {
+    setApiError("Request failed, please try again");
+  } else {
+    setApiError(err?.response?.data?.message || "Request failed");
+  }
+}
   };
 
   return (
@@ -101,6 +108,12 @@ export default function Login() {
               {sessionMessage}
             </div>
           )}
+
+          {apiError && (
+  <p className="text-red-500 text-sm mb-2">
+    {apiError}
+  </p>
+)}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 

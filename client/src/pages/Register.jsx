@@ -16,6 +16,7 @@ export default function Register() {
   });
 
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
 
   // const handleChange = (e) => {
   //   setFormData((prev) => ({
@@ -37,12 +38,14 @@ export default function Register() {
     ...prev,
     [name]: ""
   }));
+  setApiError("");
 };
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
     try {
       const nextErrors = {};
 
@@ -60,14 +63,27 @@ export default function Register() {
 
       const res = await register(formData);
 
+      // if (res?.success) {
+      //   navigate("/login");
+      // }
       if (res?.success) {
-        navigate("/dashboard");
-      } else {
+  localStorage.clear(); // 🔥 sab kuch hata do (token + user)
+
+  navigate("/login");
+}
+       else {
         setErrors({ email: res?.message || "Registration failed" });
       }
-    } catch (err) {
-      setErrors({ email: err?.message || "Something went wrong" });
-    }
+    }catch (err) {
+  if (err?.response?.status === 500) {
+    setApiError("Request failed, please try again");
+  // } else {
+  //   setApiError(err?.response?.data?.message || "Registration failed");
+  // }
+}else {
+  setApiError(res?.message || "Registration failed");
+}
+}
   };
 
   return (
@@ -111,6 +127,12 @@ export default function Register() {
           <div className="mb-4 rounded-xl bg-orange-50 text-orange-700 border border-orange-200 px-4 py-3 text-sm">
             Create your account to unlock testing, ranking and result tracking.
           </div>
+
+          {apiError && (
+  <p className="text-red-500 text-sm mb-2">
+    {apiError}
+  </p>
+)}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
