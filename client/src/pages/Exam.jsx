@@ -7,6 +7,7 @@ import { apiCall } from "../services/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 const STORAGE_KEY = "examState";
+const LATEST_RESULT_STORAGE_KEY = "latestExamResult";
 
 const getStoredUser = () => {
   try {
@@ -237,6 +238,28 @@ const submitExam = () => {
       const actualScore = data.data?.summary?.percentage || 0;
       const correctCount = data.data?.summary?.correct || 0;
       const totalQuestions = data.data?.summary?.total || 0;
+      const latestResultPayload = {
+        score: actualScore,
+        correctCount,
+        totalQuestions,
+        sectionScores: data.data?.sections || data.data?.categories || {},
+        resultData: data.data,
+      };
+
+      if (userId) {
+        try {
+          localStorage.setItem(
+            LATEST_RESULT_STORAGE_KEY,
+            JSON.stringify({
+              userId: String(userId),
+              payload: latestResultPayload,
+              updatedAt: new Date().toISOString(),
+            }),
+          );
+        } catch {
+          // Ignore storage issues.
+        }
+      }
 
       const finishNavigation = () => {
         localStorage.removeItem("examState");
@@ -286,7 +309,7 @@ const submitExam = () => {
   if (!hasStarted) {
     if (isLoadingQuestions) {
       return (
-        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+        <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
           <LoadingSpinner fullScreen label="Loading exam questions..." />
         </main>
       );
@@ -294,7 +317,7 @@ const submitExam = () => {
 
     if (showInstructions) {
       return (
-        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+        <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             {error && (
               <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
@@ -379,8 +402,8 @@ const submitExam = () => {
     }
 
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 animate-fadeIn">
           {error && (
             <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
               {error}
@@ -398,7 +421,7 @@ const submitExam = () => {
 
           <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-5 items-stretch">
             {divisionCards.map((item, i) => (
-              <Card key={item.title} className="h-full min-h-[340px] p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col">
+              <Card key={item.title} className="h-full min-h-85 p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col animate-scaleIn" hover>
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs uppercase tracking-[0.35em] text-orange-500 font-bold">Exam Card</p>
@@ -430,14 +453,14 @@ const submitExam = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-4 gap-4 sm:gap-6">
+    <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 py-6 sm:py-10 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-4 gap-4 sm:gap-6 animate-fadeIn">
 
         {/* LEFT - Main Content */}
         <div className="lg:col-span-3 space-y-4 sm:space-y-6">
 
           {/* Header Card with Timer */}
-          <Card className="bg-white dark:bg-slate-900 border-2 border-orange-100 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300">
+          <Card className="bg-white dark:bg-slate-900 border-2 border-orange-100 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 animate-slideInLeft">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="text-xs sm:text-sm font-semibold text-orange-500 uppercase tracking-wider">
@@ -460,7 +483,7 @@ const submitExam = () => {
           </Card>
 
           {/* Question Card */}
-          <Card className="bg-white dark:bg-slate-900 shadow-md hover:shadow-lg transition-all duration-300">
+          <Card className="bg-white dark:bg-slate-900 shadow-md hover:shadow-lg transition-all duration-300 animate-scaleIn">
             <div className="border-b border-gray-200 dark:border-slate-800 pb-4 mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white leading-relaxed transition-colors duration-300">
                 {/* {questions[current].question} */}
@@ -495,7 +518,7 @@ const submitExam = () => {
                       {opt}
                     </span>
                     {selected && (
-                      <CheckCircle2 className="text-orange-500 flex-shrink-0 mt-1" size={20} />
+                      <CheckCircle2 className="text-orange-500 shrink-0 mt-1" size={20} />
                     )}
                   </label>
                 );
@@ -538,7 +561,7 @@ const submitExam = () => {
         </div>
 
         {/* RIGHT - Question Palette */}
-        <Card className="bg-white dark:bg-slate-900 shadow-md sticky top-6 h-fit hover:shadow-lg transition-all duration-300">
+        <Card className="bg-white dark:bg-slate-900 shadow-md sticky top-6 h-fit hover:shadow-lg transition-all duration-300 animate-slideInRight">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-gray-900 dark:text-white text-lg transition-colors duration-300">Questions</h3>
             <span className="text-xs font-semibold bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-full transition-colors duration-300">

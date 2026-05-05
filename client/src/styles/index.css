@@ -28,17 +28,126 @@ html.dark {
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: white;
+  background:
+    radial-gradient(circle at top, rgba(255, 153, 51, 0.12), transparent 28%),
+    linear-gradient(180deg, #fffdf9 0%, #ffffff 42%, #fff7ef 100%);
   color: #111827;
   transition: background-color 300ms ease, color 300ms ease;
 }
 
 html.dark body {
-  background: #020617;
+  background:
+    radial-gradient(circle at top, rgba(255, 153, 51, 0.14), transparent 26%),
+    linear-gradient(180deg, #020617 0%, #0f172a 48%, #020617 100%);
   color: #e2e8f0;
 }
 
 ::selection {
   background: rgba(249, 115, 22, 0.25);
   color: inherit;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeInUp 0.65s ease both;
+  }
+
+  .animate-slideInLeft {
+    animation: slideInLeft 0.7s ease both;
+  }
+
+  .animate-slideInRight {
+    animation: slideInRight 0.7s ease both;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.5s ease both;
+  }
+
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+
+  .animate-float-soft {
+    animation: floatSoft 4s ease-in-out infinite;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(16px);
+  }
+
+  .dark .glass-panel {
+    background: rgba(15, 23, 42, 0.72);
+  }
 }

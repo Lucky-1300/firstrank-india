@@ -18,6 +18,8 @@ import { apiCall } from "../services/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../hooks/useAuth";
 
+const LATEST_RESULT_STORAGE_KEY = "latestExamResult";
+
 const getStoredUser = () => {
   try {
     return JSON.parse(localStorage.getItem("user") || "null");
@@ -26,37 +28,190 @@ const getStoredUser = () => {
   }
 };
 
+const toSafeNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeSectionScores = (sections) => {
+  if (!sections || typeof sections !== "object") {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(sections).map(([key, value]) => {
+      if (typeof value === "number") {
+        return [key, value];
+      }
+
+      if (typeof value === "object" && value !== null) {
+        const score = toSafeNumber(value.score, toSafeNumber(value.correct, 0));
+        const total = toSafeNumber(value.total, 0);
+        const percentage = toSafeNumber(value.percentage, total > 0 ? Math.round((score / total) * 100) : 0);
+        return [key, percentage];
+      }
+
+      return [key, 0];
+    }),
+  );
+};
+
+const normalizeResultPayload = (payload) => {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  // Shape from exam submit API: { summary, sections, categories }
+  if (payload.summary) {
+    return {
+      scorePercent: toSafeNumber(payload.summary.percentage, 0),
+      correctCount: toSafeNumber(payload.summary.correct, toSafeNumber(payload.summary.score, 0)),
+      totalQuestions: toSafeNumber(payload.summary.total, 0),
+      sectionScores: normalizeSectionScores(payload.sections || payload.categories || {}),
+      rank: payload.rank ?? null,
+      raw: payload,
+    };
+  }
+
+  // Shape from result API: { report, ... }
+  if (payload.report) {
+    const report = payload.report;
+
+    // Limited report shape: report.summary exists
+    if (report.summary) {
+      return {
+        scorePercent: toSafeNumber(report.summary.percentage, 0),
+        correctCount: toSafeNumber(report.summary.correct, toSafeNumber(report.summary.score, 0)),
+        totalQuestions: toSafeNumber(report.summary.total, 0),
+        sectionScores: normalizeSectionScores(report.sections || report.categories || {}),
+        rank: payload.rank ?? null,
+        raw: payload,
+      };
+    }
+
+    // Full report shape
+    const correctCount = toSafeNumber(report.correctCount, toSafeNumber(report.score, 0));
+    const totalQuestions = toSafeNumber(report.total, 0);
+    return {
+      scorePercent:
+        totalQuestions > 0
+          ? Math.round((correctCount / totalQuestions) * 100)
+          : toSafeNumber(report.score, 0),
+      correctCount,
+      totalQuestions,
+      sectionScores: normalizeSectionScores(report.sectionScores || report.categories || {}),
+      rank: payload.rank ?? null,
+      raw: payload,
+    };
+  }
+
+  // Shape from route state fallback: { score, correctCount, totalQuestions, sectionScores }
+  const fallbackScore = toSafeNumber(payload.score, 0);
+  return {
+    scorePercent: fallbackScore,
+    correctCount: toSafeNumber(payload.correctCount, fallbackScore),
+    totalQuestions: toSafeNumber(payload.totalQuestions, 0),
+    sectionScores: normalizeSectionScores(payload.sectionScores || {}),
+    rank: payload.rank ?? null,
+    raw: payload,
+  };
+};
+
+const readLatestCachedResult = (userId) => {
+  if (!userId) {
+    return null;
+  }
+
+  try {
+    const raw = localStorage.getItem(LATEST_RESULT_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+
+    if (!parsed || String(parsed.userId) !== String(userId)) {
+      return null;
+    }
+
+    return normalizeResultPayload(parsed.payload);
+  } catch {
+    return null;
+  }
+};
+
+const writeLatestCachedResult = (userId, payload) => {
+  if (!userId || !payload) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(
+      LATEST_RESULT_STORAGE_KEY,
+      JSON.stringify({
+        userId: String(userId),
+        payload,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    // Ignore storage errors in private mode/quota scenarios.
+  }
+};
+
 export default function Result() {
   const location = useLocation();
   const { user: authUser } = useAuth();
   const storedUser = getStoredUser();
   const sessionUser = authUser || storedUser;
+  const userId = sessionUser?.id || sessionUser?._id || localStorage.getItem("userId");
   const studentName = location.state?.studentName || sessionUser?.name || "Student";
   const studentEmail = location.state?.studentEmail || sessionUser?.email || "";
-  const [resultData, setResultData] = useState(location.state?.resultData || null);
-  const [loading, setLoading] = useState(!location.state?.resultData);
+  const initialResult = useMemo(() => {
+    const fromState = normalizeResultPayload(location.state?.resultData || location.state);
+    if (fromState) {
+      return fromState;
+    }
+
+    return readLatestCachedResult(userId);
+  }, [location.state, userId]);
+  const [latestResult, setLatestResult] = useState(initialResult);
+  const [loading, setLoading] = useState(!initialResult);
   const [error, setError] = useState("");
 
-  const score = resultData?.report?.score ?? location.state?.score ?? 0;
-  const correctCount = resultData?.report?.correctCount ?? location.state?.correctCount ?? 0;
-  const totalQuestions = resultData?.report?.total ?? location.state?.totalQuestions ?? 29;
-  const sectionScores = resultData?.report?.sectionScores || location.state?.sectionScores || {};
-  const rank = resultData?.rank ?? location.state?.rank ?? null;
+  const score = latestResult?.scorePercent ?? 0;
+  const correctCount = latestResult?.correctCount ?? 0;
+  const totalQuestions = latestResult?.totalQuestions ?? 29;
+  const sectionScores = latestResult?.sectionScores || {};
+  const rank = latestResult?.rank ?? null;
 
   const scorePercent = Math.round(score);
 
   useEffect(() => {
+    if (initialResult) {
+      setLatestResult(initialResult);
+      setLoading(false);
+      setError("");
+    }
+  }, [initialResult]);
+
+  useEffect(() => {
     const loadResult = async () => {
       const token = localStorage.getItem("authToken");
-      const userId = sessionUser?.id || localStorage.getItem("userId");
+      const hasLocalResult = Boolean(initialResult);
 
-      if (!userId || resultData) {
+      if (!userId) {
         setLoading(false);
         return;
       }
 
+      if (hasLocalResult) {
+        writeLatestCachedResult(
+          userId,
+          initialResult.raw || location.state?.resultData || location.state,
+        );
+      }
+
       if (!token) {
-        setError("Please log in to view your result.");
+        if (!hasLocalResult) {
+          setError("Please log in to view your result.");
+        }
         setLoading(false);
         return;
       }
@@ -64,19 +219,27 @@ export default function Result() {
       try {
         const response = await apiCall(`/result/${userId}`, { method: "GET" });
         if (response.success) {
-          setResultData(response.data);
+          const normalized = normalizeResultPayload(response.data);
+          if (normalized) {
+            setLatestResult(normalized);
+            writeLatestCachedResult(userId, response.data);
+          }
         } else {
-          setError(response.message || "Failed to load result");
+          if (!hasLocalResult) {
+            setError(response.message || "Failed to load result");
+          }
         }
       } catch (err) {
-        setError(err?.message || "Failed to load result");
+        if (!hasLocalResult) {
+          setError(err?.message || "Failed to load result");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadResult();
-  }, [resultData, sessionUser?.id]);
+  }, [initialResult, location.state, userId]);
 
   const skills = useMemo(() => {
     const entries = Object.entries(sectionScores || {});

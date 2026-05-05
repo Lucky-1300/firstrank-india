@@ -101,7 +101,7 @@ export default function Dashboard() {
 
   if (!ready || isLoading) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <main className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
         <LoadingSpinner fullScreen label="Loading dashboard..." />
       </main>
     );
