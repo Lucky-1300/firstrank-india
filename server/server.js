@@ -17,13 +17,49 @@ const allowedOrigins = (process.env.CORS_ORIGIN || process.env.CLIENT_ORIGIN || 
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+const isLocalDevOrigin = (origin) =>
+  /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser clients and same-origin requests without Origin header.
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    if (isLocalDevOrigin(origin) || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    // Prevent recurring local dev CORS blocks caused by stale/missing env origins.
+    if (isDevelopment) {
+      console.warn(`[cors] Allowing non-whitelisted origin in development: ${origin}`);
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Origin not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
 app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }),
+  cors(corsOptions),
 );
+
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
 
 // Middleware
 app.use(express.json({ limit: "1mb" }));

@@ -9,7 +9,7 @@ import {
   Moon,
   Sun,
   Sparkles,
-  UserCircle2,
+  User,
   Settings,
   LogOut,
   FileText,
@@ -57,6 +57,14 @@ export default function Navbar() {
     { name: "Contact", path: "/contact" },
   ];
 
+  const authNavLinks = [
+    { name: "Home", path: "/", icon: null },
+    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { name: "Exam", path: "/exam", icon: BookOpen },
+    { name: "Results", path: "/result", icon: FileText },
+    { name: "Reports", path: "/reports", icon: ClipboardList },
+  ];
+
   const activeClass = (path) =>
     location.pathname === path || location.hash === `#${path.split("#")[1]}`
       ? "text-orange-600 dark:text-orange-400 font-semibold"
@@ -90,7 +98,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+    <nav className="sticky top-0 z-50 bg-white/92 dark:bg-slate-950/88 backdrop-blur-md border-b border-white/70 dark:border-slate-800 shadow-sm transition-colors duration-300">
       <div className="w-full px-3 sm:px-4 lg:px-6 h-18 flex items-center justify-between">
         
         {/* Logo */}
@@ -136,7 +144,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <button
             onClick={toggleTheme}
-            className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300"
+            className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:shadow-md transition-all duration-300"
             aria-label="Toggle theme"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
@@ -176,7 +184,7 @@ export default function Navbar() {
                     to="/profile"
                     className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-white/10 transition-colors duration-300"
                   >
-                    <UserCircle2 size={16} />
+                    <User size={16} />
                     My Profile
                   </Link>
 
@@ -220,34 +228,94 @@ export default function Navbar() {
         <div className="flex items-center gap-2 lg:hidden">
           <button
             onClick={toggleTheme}
-            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300"
+            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:shadow-md transition-all duration-300"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
+          {token ? (
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="w-11 h-11 rounded-full bg-orange-100 text-orange-600 font-bold flex items-center justify-center border border-orange-200 hover:shadow-md transition-all duration-300 ml-1"
+                aria-label="Open user menu"
+              >
+                {userInitial}
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-14 w-56 rounded-2xl bg-white dark:bg-slate-950 border border-gray-100 dark:border-slate-800 shadow-2xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-800">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{storedUser?.name || "My Account"}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{storedUser?.email || "Signed in user"}</p>
+                  </div>
+
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-white/10 transition-colors duration-300"
+                  >
+                    <User size={16} />
+                    My Profile
+                  </Link>
+
+                  <Link
+                    to="/settings"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-white/10 transition-colors duration-300"
+                  >
+                    <Settings size={16} />
+                    Settings
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-300"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 ml-1">
+              <Link to="/register">
+                <Button size="sm" className="flex items-center gap-2 px-3 py-2 rounded-2xl">
+                  <BookOpen size={14} />
+                  Get Started
+                </Button>
+              </Link>
+
+              <Link to="/login">
+                <Button variant="secondary" size="sm" className="px-3 py-2 rounded-2xl">
+                  Login
+                </Button>
+              </Link>
+            </div>
+          )}
+
           <button
             onClick={() => setOpen(!open)}
-            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300"
+            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:shadow-md transition-all duration-300 ml-2"
             aria-label="Toggle Menu"
           >
-          <div className="space-y-1.5">
-            <span
-              className={`block w-5 h-0.5 bg-gray-700 transition ${
-                open ? "rotate-45 translate-y-2" : ""
-              }`}
-            />
-            <span
-              className={`block w-5 h-0.5 bg-gray-700 transition ${
-                open ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block w-5 h-0.5 bg-gray-700 transition ${
-                open ? "-rotate-45 -translate-y-2" : ""
-              }`}
-            />
-          </div>
+            <div className="space-y-1.5">
+              <span
+                className={`block w-5 h-0.5 bg-gray-700 dark:bg-gray-200 transition ${
+                  open ? "rotate-45 translate-y-2" : ""
+                }`}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-gray-700 dark:bg-gray-200 transition ${
+                  open ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-gray-700 dark:bg-gray-200 transition ${
+                  open ? "-rotate-45 -translate-y-2" : ""
+                }`}
+              />
+            </div>
           </button>
         </div>
       </div>
@@ -255,23 +323,53 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`lg:hidden overflow-hidden transition-all duration-300 ${
-          open ? "max-h-screen border-t border-gray-100" : "max-h-0"
+          open ? "max-h-screen border-t border-gray-100 dark:border-slate-800" : "max-h-0"
         }`}
       >
         <div className="px-5 py-5 bg-white dark:bg-slate-950 flex flex-col gap-2 transition-colors duration-300">
-          <div className="space-y-2">
-            {navLinks.map((item) => (
-              <Link key={item.path} to={item.path}>
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  className={`justify-center my-1 rounded-2xl ${activeClass(item.path)}`}
-                >
-                  {item.name}
-                </Button>
-              </Link>
-            ))}
-          </div>
+          {token ? (
+            <>
+              <div className="space-y-2">
+                {authNavLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.path} to={item.path}>
+                      <Button
+                        variant="secondary"
+                        fullWidth
+                        className={`justify-center my-1 rounded-2xl ${
+                          location.pathname === item.path
+                            ? "text-orange-600 dark:text-orange-400 font-semibold"
+                            : ""
+                        }`}
+                      >
+                        {Icon ? <Icon size={16} className="mr-2" /> : null}
+                        {item.name}
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Settings and Logout are available from the avatar dropdown; removed duplicate here */}
+            </>
+          ) : (
+            <div className="space-y-2">
+              {navLinks.map((item) => (
+                <Link key={item.path} to={item.path}>
+                  <Button
+                    variant="secondary"
+                    fullWidth
+                    className={`justify-center my-1 rounded-2xl ${activeClass(item.path)}`}
+                  >
+                    {item.name}
+                  </Button>
+                </Link>
+              ))}
+
+              {/* Get Started / Login moved to header for unauthenticated users */}
+            </div>
+          )}
         </div>
       </div>
     </nav>

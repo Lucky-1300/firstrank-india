@@ -154,13 +154,13 @@ export default function Home() {
   return (
     <main className="bg-white dark:bg-slate-950 dark:text-slate-100 overflow-hidden transition-colors duration-300">
       {/* HERO */}
-      <section className="relative px-6 pt-8 pb-20 bg-gradient-to-br from-orange-50 via-white to-orange-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
+      <section className="relative px-6 pt-8 pb-20 bg-linear-to-br from-orange-50 via-white to-orange-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <Carousel
             items={heroSlides.map((slide, i) => (
               <div
                 key={i}
-                className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center min-h-[560px] md:min-h-[640px] lg:min-h-[700px]"
+                className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center min-h-140 md:min-h-160 lg:min-h-175"
               >
                 {/* Left */}
                 <motion.div
@@ -194,7 +194,7 @@ export default function Home() {
 
                     <Link
                       to="/#how-it-works"
-                      className="inline-flex items-center justify-center rounded-full border border-orange-500 px-8 py-4 text-base font-semibold text-orange-600 hover:bg-orange-50 transition-all duration-300"
+                      className="inline-flex items-center justify-center rounded-full border border-orange-500 bg-white/80 dark:bg-slate-950/70 px-8 py-4 text-base font-semibold text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-all duration-300 shadow-sm"
                     >
                       <ChevronRight size={18} />
                       <span className="ml-2">How It Works</span>
@@ -224,7 +224,7 @@ export default function Home() {
                   transition={{ duration: 0.8 }}
                   className="relative w-full mb-2 lg:mb-0"
                 >
-                  <div className="relative w-full h-[220px] sm:h-[300px] md:h-[420px] lg:h-[560px] overflow-hidden rounded-3xl lg:rounded-4xl transition-colors duration-300 shadow-2xl">
+                  <div className="relative w-full h-55 sm:h-75 md:h-105 lg:h-140 overflow-hidden rounded-3xl lg:rounded-4xl transition-colors duration-300 shadow-2xl">
                     <img
                       src={slide.image}
                       alt={slide.title1}
@@ -234,7 +234,7 @@ export default function Home() {
                     <motion.div
                       animate={{ y: [0, -10, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute top-3 sm:top-6 left-2 sm:left-3 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                      className="absolute top-3 sm:top-6 left-2 sm:left-3 z-20 glass-panel shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
                     >
                       <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Your Rank</p>
                       <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">#12 National</p>
@@ -243,7 +243,7 @@ export default function Home() {
                     <motion.div
                       animate={{ y: [0, 12, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute bottom-3 sm:bottom-8 right-2 sm:right-3 z-20 bg-white/95 dark:bg-slate-950/95 shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80 backdrop-blur-md"
+                      className="absolute bottom-3 sm:bottom-8 right-2 sm:right-3 z-20 glass-panel shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
                     >
                       <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Skill Score</p>
                       <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">87 / 100</p>
@@ -296,7 +296,7 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-5 items-stretch">
             {divisionCards.map((item, i) => (
               <motion.div key={item.title} whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
-                <Card className="h-full min-h-[340px] p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col">
+                <Card className="h-full min-h-85 p-8 sm:p-9 border border-orange-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col">
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs uppercase tracking-[0.35em] text-orange-500 font-bold">Exam Card</p>
@@ -429,7 +429,7 @@ export default function Home() {
                 <div className="opacity-30 select-none">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h3>
                   <p className="mt-3 text-gray-600 dark:text-slate-300 leading-7">{desc}</p>
-                  <div className="mt-6 h-32 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-50 dark:from-slate-800 dark:to-slate-700" />
+                  <div className="mt-6 h-32 rounded-2xl bg-linear-to-br from-orange-100 to-orange-50 dark:from-slate-800 dark:to-slate-700" />
                 </div>
               </Card>
             ))}
@@ -509,7 +509,7 @@ export default function Home() {
 
       {/* CTA */}
       <section id="contact" className="px-6 pb-24">
-        <div className="max-w-7xl mx-auto rounded-[2rem] bg-gradient-to-r from-orange-500 to-orange-400 text-white text-center py-20 px-6 shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
+        <div className="max-w-7xl mx-auto rounded-4xl bg-linear-to-r from-orange-500 to-orange-400 text-white text-center py-20 px-6 shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
           <h2 className="text-5xl font-black">
             Ready to discover your true potential?
           </h2>

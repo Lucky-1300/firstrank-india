@@ -44,21 +44,21 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 sm:py-10 lg:py-12">
+    <main className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 sm:py-10 lg:py-12 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <section className="flex flex-col lg:flex-row gap-5 lg:items-center lg:justify-between">
           <div>
-            <p className="text-orange-500 text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">
+            <p className="text-orange-500 dark:text-orange-400 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] transition-colors duration-300">
               Admin Panel
             </p>
 
-            <h1 className="mt-3 text-3xl sm:text-5xl font-black text-gray-900">
+            <h1 className="mt-3 text-3xl sm:text-5xl font-black text-gray-900 dark:text-white transition-colors duration-300">
               Admin Dashboard
             </h1>
 
-            <p className="mt-3 text-sm sm:text-base text-gray-500">
+            <p className="mt-3 text-sm sm:text-base text-gray-500 dark:text-slate-400 transition-colors duration-300">
               Manage users, exams, analytics and platform growth.
             </p>
           </div>
@@ -74,11 +74,11 @@ export default function AdminDashboard() {
         <section className="mt-8 sm:mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map(([title, value], i) => (
             <Card key={i} className="p-5">
-              <p className="text-xs sm:text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 transition-colors duration-300">
                 {title}
               </p>
 
-              <h3 className="mt-2 text-2xl sm:text-3xl font-black text-orange-500">
+              <h3 className="mt-2 text-2xl sm:text-3xl font-black text-orange-500 dark:text-orange-400 transition-colors duration-300">
                 {value}
               </h3>
             </Card>
@@ -91,11 +91,11 @@ export default function AdminDashboard() {
           {/* Recent Users */}
           <Card className="lg:col-span-2">
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
                 Recent Users
               </h3>
 
-              <button className="text-sm font-semibold text-orange-500 hover:text-orange-600">
+              <button className="text-sm font-semibold text-orange-500 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300 transition-colors duration-300">
                 View All
               </button>
             </div>
@@ -105,25 +105,25 @@ export default function AdminDashboard() {
               {users.map((user, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-gray-100 p-4 bg-white"
+                  className="rounded-2xl border border-gray-100 dark:border-slate-700 p-4 bg-white dark:bg-slate-900 transition-colors duration-300"
                 >
                   <div className="flex justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white transition-colors duration-300">
                         {user.name}
                       </p>
 
-                      <p className="text-sm text-gray-500 break-all">
+                      <p className="text-sm text-gray-500 dark:text-slate-400 break-all transition-colors duration-300">
                         {user.email}
                       </p>
                     </div>
 
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-slate-400 transition-colors duration-300">
                       {user.joined}
                     </span>
                   </div>
 
-                  <span className="inline-block mt-3 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-medium">
+                  <span className="inline-block mt-3 px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-500/15 text-orange-600 dark:text-orange-300 text-xs font-medium transition-colors duration-300">
                     {user.category}
                   </span>
                 </div>
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             {/* Desktop Table */}
             <div className="hidden sm:block mt-6 overflow-x-auto">
               <table className="w-full text-left min-w-[620px]">
-                <thead className="border-b text-sm text-gray-500">
+                <thead className="border-b dark:border-slate-700 text-sm text-gray-500 dark:text-slate-400 transition-colors duration-300">
                   <tr>
                     <th className="pb-4">Name</th>
                     <th className="pb-4">Email</th>
@@ -148,11 +148,11 @@ export default function AdminDashboard() {
                       key={i}
                       className="border-b last:border-0 hover:bg-orange-50 transition"
                     >
-                      <td className="py-4 font-medium text-gray-900">
+                      <td className="py-4 font-medium text-gray-900 dark:text-white transition-colors duration-300">
                         {user.name}
                       </td>
 
-                      <td className="py-4 text-gray-600">
+                      <td className="py-4 text-gray-600 dark:text-slate-300 transition-colors duration-300">
                         {user.email}
                       </td>
 
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
 
-                      <td className="py-4 text-gray-500">
+                      <td className="py-4 text-gray-500 dark:text-slate-400 transition-colors duration-300">
                         {user.joined}
                       </td>
                     </tr>
