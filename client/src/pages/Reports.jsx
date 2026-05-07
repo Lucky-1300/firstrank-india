@@ -34,12 +34,31 @@ export default function Reports() {
     },
   ];
 
-  const strengths = [
-    ["Decision Making", 92],
-    ["Leadership", 88],
-    ["Logic", 85],
-    ["Communication", 79],
+const stored = JSON.parse(localStorage.getItem("latestExamResult")) || {};
+const sections = stored.payload?.report?.sections || {};
+const labelMap = {
+  Decision: "Decision Making",
+  Leadership: "Leadership",
+  Finance: "Logic",
+};
+
+
+const order = ["Decision", "Leadership", "Finance", "Communication"];
+
+const strengths = order.map((key) => {
+  const value = sections[key];
+
+  let percent = 0;
+
+  if (value) {
+    percent = value.percentage || 0;
+  }
+
+  return [
+    labelMap[key] || key, // Communication automatically same rahega
+    Math.min(100, Math.round(percent)),
   ];
+});
 
   const recommendations = [
     "Practice 2 finance-based case studies every week",
@@ -47,6 +66,15 @@ export default function Reports() {
     "Review your weak-question patterns after each test",
     "Focus on speed plus accuracy in section 2",
   ];
+
+
+if (!strengths.length) {
+  return <div className="text-center mt-10">No data available</div>;
+}
+
+
+
+
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 sm:py-10 lg:py-14 transition-colors duration-300">
@@ -77,7 +105,9 @@ export default function Reports() {
                 <div key={name}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-medium text-gray-700 dark:text-slate-300 text-sm sm:text-base transition-colors duration-300">
-                      {name}
+                      {name
+  .replace(/([A-Z])/g, " $1")
+  .replace(/^./, (str) => str.toUpperCase())}
                     </span>
                     <span className="text-orange-600 font-bold text-sm">{value}%</span>
                   </div>
