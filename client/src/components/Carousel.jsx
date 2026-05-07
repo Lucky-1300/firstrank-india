@@ -24,22 +24,24 @@ export default function Carousel({
     setCurrent((prev) => (prev - 1 + items.length) % items.length);
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Slides */}
-      <div
-        className="flex transition-transform duration-700 ease-in-out w-full"
-        style={{
-          transform: `translateX(-${current * 100}%)`,
-        }}
-      >
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className="min-w-full w-full flex-shrink-0"
-          >
-            {item}
-          </div>
-        ))}
+    <div className="relative w-full overflow-visible">
+      <div className="overflow-hidden">
+        {/* Slides */}
+        <div
+          className="flex transition-transform duration-700 ease-in-out w-full"
+          style={{
+            transform: `translateX(-${current * 100}%)`,
+          }}
+        >
+          {items.map((item, i) => (
+            <div
+              key={i}
+              className="min-w-full w-full shrink-0"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
       </div>
 
       {showArrows && (
@@ -47,17 +49,19 @@ export default function Carousel({
           {/* Left */}
           <button
             onClick={prev}
-            className="absolute top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
+            className="absolute left-2 sm:left-3 lg:-left-20 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
           >
-            <ChevronLeft size={22} />
+            <ChevronLeft size={18} className="sm:hidden" />
+            <ChevronLeft size={22} className="hidden sm:block" />
           </button>
 
           {/* Right */}
           <button
             onClick={next}
-            className="absolute right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
+            className="absolute right-2 sm:right-3 lg:-right-20 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition"
           >
-            <ChevronRight size={22} />
+            <ChevronRight size={18} className="sm:hidden" />
+            <ChevronRight size={22} className="hidden sm:block" />
           </button>
         </>
       )}
