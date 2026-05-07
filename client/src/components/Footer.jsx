@@ -1,7 +1,31 @@
 import { Link } from "react-router-dom";
+import { FaGithub, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+
+  const contactLinks = [
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com",
+      icon: FaLinkedin,
+    },
+    {
+      label: "Twitter",
+      href: "https://twitter.com",
+      icon: FaTwitter,
+    },
+    {
+      label: "Instagram",
+      href: "https://instagram.com",
+      icon: FaInstagram,
+    },
+    {
+      label: "GitHub",
+      href: "https://github.com",
+      icon: FaGithub,
+    },
+  ];
 
   const productLinks = [
     { name: "Leaderboard", path: "/leaderboard" },
@@ -13,8 +37,6 @@ export default function Footer() {
   const companyLinks = [
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
-    { name: "Careers", path: "/careers" },
-    { name: "News", path: "/news" },
   ];
 
   const legalLinks = [
@@ -23,13 +45,11 @@ export default function Footer() {
     { name: "Cookies", path: "/cookies" },
   ];
 
-  const socials = ["📘", "📷", "▶️", "𝕏"];
-
   return (
     <footer className="bg-gray-950 dark:bg-slate-950 text-white mt-16 sm:mt-24 transition-colors duration-300">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10">
 
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
@@ -50,18 +70,6 @@ export default function Footer() {
               Discover your true potential beyond marks through skill-based
               assessments, rankings and career guidance.
             </p>
-
-            {/* Socials */}
-            <div className="flex gap-3 mt-6">
-              {socials.map((icon, i) => (
-                <button
-                  key={i}
-                  className="w-10 h-10 rounded-full bg-gray-900 hover:bg-orange-500 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center text-sm"
-                >
-                  {icon}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Product */}
@@ -118,6 +126,46 @@ export default function Footer() {
                   {item.name}
                 </Link>
               ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="sm:col-span-2 lg:col-span-1 lg:justify-self-end">
+            <h4 className="font-bold text-orange-400 mb-5">
+              Contact
+            </h4>
+
+            <div className="space-y-3 text-sm">
+              <a
+                href="mailto:tlnexoratechnologies@gmail.com"
+                className="block text-gray-400 hover:text-white transition-colors duration-300 break-all"
+              >
+                firstrankindia.test@gmail.com
+              </a>
+
+              <a
+                href="tel:+919320050310"
+                className="block text-gray-400 hover:text-white transition-colors duration-300"
+              >
+                +91 9320050310
+              </a>
+
+              <p className="text-gray-400">India</p>
+
+              <div className="flex gap-3 pt-2">
+                {contactLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="text-gray-400 transition-colors text-xl hover:text-white dark:hover:text-blue-400"
+                  >
+                    <item.icon />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 

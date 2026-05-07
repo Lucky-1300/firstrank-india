@@ -102,6 +102,8 @@ export default function Home() {
     "Gamified Learning",
   ];
 
+  const trustBadges = [Brain, Trophy, Star, Rocket];
+
   const divisionCards = [
     {
       title: "6-8",
@@ -202,12 +204,14 @@ export default function Home() {
                   </div>
 
                   <div className="mt-10 flex items-center gap-4">
-                    <div className="flex -space-x-3">
-                      {[1, 2, 3, 4].map((x) => (
+                    <div className="flex -space-x-2">
+                      {trustBadges.map((Icon, index) => (
                         <div
-                          key={x}
-                          className="w-11 h-11 rounded-full border-2 border-white bg-orange-200"
-                        />
+                          key={index}
+                          className="w-11 h-11 rounded-full border-2 border-white bg-orange-200 flex items-center justify-center text-white"
+                        >
+                          <Icon size={15} strokeWidth={2.5} />
+                        </div>
                       ))}
                     </div>
 
@@ -224,7 +228,7 @@ export default function Home() {
                   transition={{ duration: 0.8 }}
                   className="relative w-full mb-2 lg:mb-0"
                 >
-                  <div className="relative w-full h-55 sm:h-75 md:h-105 lg:h-140 overflow-hidden rounded-3xl lg:rounded-4xl transition-colors duration-300 shadow-2xl">
+                  <div className="relative w-full h-55 sm:h-75 md:h-105 lg:h-140 overflow-hidden rounded-3xl lg:rounded-4xl transition-colors duration-300">
                     <img
                       src={slide.image}
                       alt={slide.title1}
@@ -234,7 +238,7 @@ export default function Home() {
                     <motion.div
                       animate={{ y: [0, -10, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute top-3 sm:top-6 left-2 sm:left-3 z-20 glass-panel shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
+                      className="absolute top-3 sm:top-6 left-2 sm:left-3 z-20 glass-panel px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
                     >
                       <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Your Rank</p>
                       <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">#12 National</p>
@@ -243,7 +247,7 @@ export default function Home() {
                     <motion.div
                       animate={{ y: [0, 12, 0] }}
                       transition={{ repeat: Infinity, duration: 3 }}
-                      className="absolute bottom-3 sm:bottom-8 right-2 sm:right-3 z-20 glass-panel shadow-xl px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
+                      className="absolute bottom-3 sm:bottom-8 right-2 sm:right-3 z-20 glass-panel px-3 sm:px-5 py-2 sm:py-4 rounded-2xl border border-gray-100/80 dark:border-slate-700/80"
                     >
                       <p className="text-gray-500 dark:text-slate-400 text-xs sm:text-sm">Skill Score</p>
                       <p className="font-bold text-sm sm:text-xl text-gray-900 dark:text-white">87 / 100</p>
@@ -257,7 +261,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT / FEATURES */}
-      <section id="about" className="px-6 -mt-10 relative z-10 py-16">
+      <section id="about" className="px-6 -mt-10 relative z-10 py-10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-5">
           {[
             ["50K+", "Students Assessed"],
@@ -326,7 +330,7 @@ export default function Home() {
       </section>
 
       {/* PLATFORM */}
-      <section id="features" className="py-24 px-6">
+      <section id="features" className="py-10 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Our Platform
@@ -368,7 +372,7 @@ export default function Home() {
       </section>
 
       {/* WHY */}
-      <section className="py-24 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+      <section className="py-10 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Why Choose Us
@@ -393,7 +397,7 @@ export default function Home() {
       </section>
 
       {/* PREMIUM LOCKED */}
-      <section id="pricing" className="py-24 px-6">
+      <section id="pricing" className="py-10 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-4 mb-8">
             <div>
@@ -438,7 +442,7 @@ export default function Home() {
       </section>
 
       {/* HOW */}
-      <section id="how-it-works" className="py-24 px-6">
+      <section id="how-it-works" className="py-10 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             How It Works
@@ -466,7 +470,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+      <section className="py-10 px-6 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <span className="px-5 py-2 rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-300 transition-colors duration-300">
             Testimonials
@@ -490,7 +494,7 @@ export default function Home() {
       </section>
 
       {/* TECH */}
-      <section className="py-24 px-6">
+      <section className="py-10 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <h3 className="text-2xl font-semibold text-gray-700 dark:text-slate-300 transition-colors duration-300">
             Powered by modern technology
@@ -520,7 +524,7 @@ export default function Home() {
 
           <div className="mt-10 flex justify-center gap-4 flex-wrap">
             <Link to="/register">
-              <Button size="lg" className="bg-white text-orange-500 hover:bg-orange-50">
+              <Button size="lg" className="bg-white text-orange-500 border-white hover:bg-orange-50">
                 Start Free Test
               </Button>
             </Link>

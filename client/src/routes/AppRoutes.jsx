@@ -23,6 +23,7 @@ import Pricing from '../pages/Pricing';
 import Contact from '../pages/Contact';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsOfService from '../pages/TermsOfService';
+import Cookies from '../pages/Cookies';
 // import Institutions from '../pages/Institutions';
 // import News from '../pages/News';
 // import About from '../pages/About';
@@ -40,6 +41,7 @@ export default function AppRoutes() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/cookies" element={<Cookies />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
