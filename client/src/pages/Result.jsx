@@ -318,7 +318,7 @@ export default function Result() {
             Results
           </p>
 
-          <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">
+          <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white transition-colors duration-300">
             🎉 Report for {studentName}
           </h1>
 
